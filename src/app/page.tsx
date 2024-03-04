@@ -1,11 +1,8 @@
-// pages/index.tsx
-import { useState } from 'react';
-import { GetServerSideProps } from 'next';
 import { Header } from '@/components/Header';
-import { Hero } from '@/components/Hero';
-import { Testimonials } from '@/components/Testimonials';
 import { Footer } from '@/components/Footer';
 import UserList from '@/components/UserList';
+import UserAdd from '@/components/UserAdd';
+
 
 interface User {
   id: number;
@@ -24,8 +21,7 @@ const Home: React.FC<HomeProps> = ({ users }) => {
       <Header />
       <main>
         <UserList />
-        <Hero />
-        <Testimonials />
+        <UserAdd />
       </main>
       <Footer />
     </>

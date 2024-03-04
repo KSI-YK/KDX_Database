@@ -2,7 +2,9 @@
 const nextConfig = {
     experimental: {
       serverActions: true,
+      revalidate: true,
     },
+
   };
   
   module.exports = nextConfig;
