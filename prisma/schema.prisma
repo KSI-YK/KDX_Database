@@ -1,0 +1,224 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+// prismaを使用
+generator client {
+  provider = "prisma-client-js"
+}
+
+// 接続先は.envファイルで定義
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator erd {
+  provider = "prisma-erd-generator"
+  output = "ER.svg"
+}
+
+// テーブル定義
+// 部署
+model Departments {
+  id        Int     @id @default(autoincrement())
+  name      String  @unique
+  user      User[]
+  taskTypes     TaskTypes[]
+}
+
+model TaskTypes {
+  id            Int     @id @default(autoincrement())
+  name          String  @unique
+
+  // relation
+  departmentId  Int
+  department    Departments @relation(fields: [departmentId], references: [id])
+  tasks         Tasks[]
+
+}
+
+// ユーザー
+model User {
+  id           Int         @id @default(autoincrement())
+  email        String?     @unique
+  name         String
+
+
+  // relation
+  departmentId Int         // This field is added
+  department   Departments @relation(fields: [departmentId], references: [id])
+
+  // ディレクターID 1対多
+  systems      Systems[]
+  devices      Devices[]
+  projects     Projects[]
+  tasks        Tasks[]
+  reports      Reports[]
+
+  // 多対多
+  manageProjects   Projects[] @relation("ProjectManagers")  // プロジェクト担当者
+  managers         Tasks[]    @relation("TaskManagers")
+  viewReports      Reports[]  @relation("ReportViewers") // レポート閲覧履歴管理
+
+}
+
+// クライアント
+model Clients {
+  id           Int    @id @default(autoincrement())
+  name         String @unique
+
+  // relation
+  system       Systems[]
+
+  // datetime
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+}
+
+// システムテーブルの定義
+model Systems {
+  id           Int    @id @default(autoincrement())
+  name         String
+  model        String?
+  total_cnt    Int
+
+  // relation
+  clientId     Int
+  client       Clients @relation(fields: [clientId], references: [id])
+  device       Devices[]
+
+  directorId     Int
+  director       User @relation(fields: [directorId], references: [id])
+
+  // datetime
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+}
+
+// デバイス
+model Devices {
+  id           Int    @id @default(autoincrement())
+  name         String
+  model        String?
+
+  // ディレクター
+  directorId     Int
+  director       User @relation(fields: [directorId], references: [id])
+
+  // relation
+  systemId     Int
+  system       Systems @relation(fields: [systemId], references: [id])
+  project      Projects[]
+
+  // datetime
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+}
+
+// プロジェクト種別
+model ProjectTypes {
+  id           Int    @id @default(autoincrement())
+  name         String @unique
+  projects     Projects[]
+}
+
+// ステータス
+model Status {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  // relation
+  projects Projects[]
+  tasks Tasks[]
+
+}
+
+// プロジェクト
+model Projects {
+  id           Int    @id @default(autoincrement())
+  name         String
+
+  // 状態
+  statusId Int
+  status   Status @relation(fields: [statusId], references: [id])
+
+  // 種別
+  typeId       Int
+  type         ProjectTypes @relation(fields: [typeId], references: [id])
+  
+  // ディレクター
+  directorId   Int
+  director     User @relation(fields: [directorId], references: [id])
+
+  // relation
+  deviceId     Int
+  device       Devices @relation(fields: [deviceId], references: [id])
+  task         Tasks[]
+
+  // 多対多
+  projectManagers   User[] @relation("ProjectManagers")  // プロジェクト担当者
+
+  // datetime
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+}
+
+// タスク
+model Tasks {
+  id           Int    @id @default(autoincrement())
+  name         String
+  model        String
+  total_cnt    Int
+
+  // 状態
+  statusId Int
+  status   Status @relation(fields: [statusId], references: [id])
+
+  // ディレクター
+  directorId   Int
+  director     User @relation(fields: [directorId], references: [id])
+
+  // relation
+  projectId     Int
+  project       Projects @relation(fields: [projectId], references: [id])
+  report        Reports[]
+
+  typeId        Int
+  type          TaskTypes @relation(fields: [typeId], references: [id])
+
+  managers      User[] @relation("TaskManagers")
+
+  // datetime
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+}
+
+// レポート
+model Reports {
+  id           Int    @id @default(autoincrement())
+  name         String
+  model        String
+  total_cnt    Int
+
+  // ディレクター
+  directorId   Int
+  director     User @relation(fields: [directorId], references: [id])
+
+  // relation
+  taskId       Int
+  task         Tasks @relation(fields: [taskId], references: [id])
+
+  // 閲覧履歴 多対多
+  reporViewers        User[] @relation("ReportViewers")  // レポート閲覧履歴管理
+
+  // datetime
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+}

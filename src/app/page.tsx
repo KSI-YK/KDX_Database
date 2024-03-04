@@ -1,27 +1,35 @@
-import { CallToAction } from '@/components/CallToAction'
-import { Faqs } from '@/components/Faqs'
-import { Footer } from '@/components/Footer'
-import { Header } from '@/components/Header'
-import { Hero } from '@/components/Hero'
-import { Pricing } from '@/components/Pricing'
-import { PrimaryFeatures } from '@/components/PrimaryFeatures'
-import { SecondaryFeatures } from '@/components/SecondaryFeatures'
-import { Testimonials } from '@/components/Testimonials'
+// pages/index.tsx
+import { useState } from 'react';
+import { GetServerSideProps } from 'next';
+import { Header } from '@/components/Header';
+import { Hero } from '@/components/Hero';
+import { Testimonials } from '@/components/Testimonials';
+import { Footer } from '@/components/Footer';
+import UserList from '@/components/UserList';
 
-export default function Home() {
+interface User {
+  id: number;
+  name: string;
+  email: string;
+}
+
+interface HomeProps {
+  users: User[];
+}
+
+
+const Home: React.FC<HomeProps> = ({ users }) => {
   return (
     <>
       <Header />
       <main>
+        <UserList />
         <Hero />
-        <PrimaryFeatures />
-        <SecondaryFeatures />
-        <CallToAction />
         <Testimonials />
-        <Pricing />
-        <Faqs />
       </main>
       <Footer />
     </>
-  )
-}
+  );
+};
+
+export default Home;
