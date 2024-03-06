@@ -33,5 +33,5 @@ export default {
       },
     },
   },
-  plugins: [formsPlugin, headlessuiPlugin, require('@tailwindcss/forms'),],
+  plugins: [formsPlugin, headlessuiPlugin,],
 } satisfies Config

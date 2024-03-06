@@ -7,10 +7,10 @@ import { type Metadata } from 'next'
 export const metadata: Metadata = {
   title: {
     template: '%s - TaxPal',
-    default: 'TaxPal - Accounting made simple for small businesses',
+    default: 'KDX Database',
   },
   description:
-    'Most bookkeeping software is accurate, but hard to use. We make the opposite trade-off, and hope you don’t get audited.',
+    'KANAMORI SYSTEM Inc.のデータベースです。',
 }
 
 const inter = Inter({
@@ -32,7 +32,7 @@ export default function RootLayout({
 }) {
   return (
     <html
-      lang="en"
+      lang="ja"
       className={clsx(
         'h-full scroll-smooth bg-white antialiased',
         inter.variable,

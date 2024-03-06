@@ -21,7 +21,6 @@ const Home: React.FC<HomeProps> = ({ users }) => {
     <>
       <Header />
       <main>
-        <CreateUser />
         <UserList />
       </main>
       <Footer />

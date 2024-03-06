@@ -17,61 +17,126 @@ datasource db {
 
 generator erd {
   provider = "prisma-erd-generator"
-  output = "ER.svg"
+  output   = "ER.svg"
 }
 
 // テーブル定義
 // 部署
 model Departments {
-  id        Int     @id @default(autoincrement())
-  name      String  @unique
+  id        String      @id @default(cuid())
+  name      String      @unique
   user      User[]
-  taskTypes     TaskTypes[]
+  taskTypes TaskTypes[]
 }
 
 model TaskTypes {
-  id            Int     @id @default(autoincrement())
-  name          String  @unique
+  id   String @id @default(cuid())
+  name String @unique
 
   // relation
-  departmentId  Int
-  department    Departments @relation(fields: [departmentId], references: [id])
-  tasks         Tasks[]
+  departmentId String
+  department   Departments @relation(fields: [departmentId], references: [id])
+  tasks        Tasks[]
+}
+
+// 認証用アカウント
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+// セッション用
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// セッショントークン
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ユーザータイプ
+model UserTypes {
+  id          String @id @default(cuid())
+  name        String @unique
+  user        User[]
+
+}
+
+// ユーザータイプ
+model UserPosts {
+  id          String @id @default(cuid())
+  name        String @unique
+  user        User[]
 
 }
 
 // ユーザー
 model User {
-  id           Int         @id @default(autoincrement())
-  email        String?     @unique
-  name         String
-
+  id             String    @id @default(cuid())
+  name           String
+  username       String    @unique//ログイン用ユーザーネーム
+  email          String?   @unique
+  emailVerified  DateTime?
+  image          String?
+  accounts       Account[]
+  sessions       Session[]
+  hashedPassword String // パスワード
 
   // relation
-  departmentId Int         // This field is added
+  departmentId String // This field is added
   department   Departments @relation(fields: [departmentId], references: [id])
 
+  // relation
+  typeId String // This field is added
+  type   UserTypes @relation(fields: [typeId], references: [id])
+
+  // relation
+  postId String // This field is added
+  post   UserPosts @relation(fields: [postId], references: [id])
+
   // ディレクターID 1対多
-  systems      Systems[]
-  devices      Devices[]
-  projects     Projects[]
-  tasks        Tasks[]
-  reports      Reports[]
+  systems  Systems[]
+  devices  Devices[]
+  projects Projects[]
+  tasks    Tasks[]
+  reports  Reports[]
 
   // 多対多
-  manageProjects   Projects[] @relation("ProjectManagers")  // プロジェクト担当者
-  managers         Tasks[]    @relation("TaskManagers")
-  viewReports      Reports[]  @relation("ReportViewers") // レポート閲覧履歴管理
-
+  manageProjects Projects[] @relation("ProjectManagers") // プロジェクト担当者
+  managers       Tasks[]    @relation("TaskManagers")
+  viewReports    Reports[]  @relation("ReportViewers") // レポート閲覧履歴管理
 }
 
 // クライアント
 model Clients {
-  id           Int    @id @default(autoincrement())
-  name         String @unique
+  id   String @id @default(cuid())
+  name String @unique
 
   // relation
-  system       Systems[]
+  system Systems[]
 
   // datetime
   createdAt DateTime @default(now()) @map("created_at")
@@ -80,18 +145,18 @@ model Clients {
 
 // システムテーブルの定義
 model Systems {
-  id           Int    @id @default(autoincrement())
-  name         String
-  model        String?
-  total_cnt    Int
+  id        String  @id @default(cuid())
+  name      String
+  model     String?
+  total_cnt Int
 
   // relation
-  clientId     Int
-  client       Clients @relation(fields: [clientId], references: [id])
-  device       Devices[]
+  clientId String
+  client   Clients   @relation(fields: [clientId], references: [id])
+  device   Devices[]
 
-  directorId     Int
-  director       User @relation(fields: [directorId], references: [id])
+  directorId String
+  director   User   @relation(fields: [directorId], references: [id])
 
   // datetime
   createdAt DateTime @default(now()) @map("created_at")
@@ -100,125 +165,120 @@ model Systems {
 
 // デバイス
 model Devices {
-  id           Int    @id @default(autoincrement())
-  name         String
-  model        String?
+  id    String  @id @default(cuid())
+  name  String
+  model String?
 
   // ディレクター
-  directorId     Int
-  director       User @relation(fields: [directorId], references: [id])
+  directorId String
+  director   User   @relation(fields: [directorId], references: [id])
 
   // relation
-  systemId     Int
-  system       Systems @relation(fields: [systemId], references: [id])
-  project      Projects[]
+  systemId String
+  system   Systems    @relation(fields: [systemId], references: [id])
+  project  Projects[]
 
   // datetime
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-  
 }
 
 // プロジェクト種別
 model ProjectTypes {
-  id           Int    @id @default(autoincrement())
-  name         String @unique
-  projects     Projects[]
+  id       String     @id @default(cuid())
+  name     String     @unique
+  projects Projects[]
 }
 
 // ステータス
 model Status {
-  id   Int    @id @default(autoincrement())
+  id   String @id @default(cuid())
   name String @unique
 
   // relation
   projects Projects[]
-  tasks Tasks[]
-
+  tasks    Tasks[]
 }
 
 // プロジェクト
 model Projects {
-  id           Int    @id @default(autoincrement())
-  name         String
+  id   String @id @default(cuid())
+  name String
 
   // 状態
-  statusId Int
+  statusId String
   status   Status @relation(fields: [statusId], references: [id])
 
   // 種別
-  typeId       Int
-  type         ProjectTypes @relation(fields: [typeId], references: [id])
-  
+  typeId String
+  type   ProjectTypes @relation(fields: [typeId], references: [id])
+
   // ディレクター
-  directorId   Int
-  director     User @relation(fields: [directorId], references: [id])
+  directorId String
+  director   User   @relation(fields: [directorId], references: [id])
 
   // relation
-  deviceId     Int
-  device       Devices @relation(fields: [deviceId], references: [id])
-  task         Tasks[]
+  deviceId String
+  device   Devices @relation(fields: [deviceId], references: [id])
+  task     Tasks[]
 
   // 多対多
-  projectManagers   User[] @relation("ProjectManagers")  // プロジェクト担当者
+  projectManagers User[] @relation("ProjectManagers") // プロジェクト担当者
 
   // datetime
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-  
 }
 
 // タスク
 model Tasks {
-  id           Int    @id @default(autoincrement())
-  name         String
-  model        String
-  total_cnt    Int
+  id        String @id @default(cuid())
+  name      String
+  model     String
+  total_cnt Int
 
   // 状態
-  statusId Int
+  statusId String
   status   Status @relation(fields: [statusId], references: [id])
 
   // ディレクター
-  directorId   Int
-  director     User @relation(fields: [directorId], references: [id])
+  directorId String
+  director   User   @relation(fields: [directorId], references: [id])
 
   // relation
-  projectId     Int
-  project       Projects @relation(fields: [projectId], references: [id])
-  report        Reports[]
+  projectId String
+  project   Projects  @relation(fields: [projectId], references: [id])
+  report    Reports[]
 
-  typeId        Int
-  type          TaskTypes @relation(fields: [typeId], references: [id])
+  typeId String
+  type   TaskTypes @relation(fields: [typeId], references: [id])
 
-  managers      User[] @relation("TaskManagers")
+  managers User[] @relation("TaskManagers")
 
   // datetime
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-  
 }
 
 // レポート
 model Reports {
-  id           Int    @id @default(autoincrement())
-  name         String
-  model        String
-  total_cnt    Int
+  id        String @id @default(cuid())
+  name      String
+  model     String
+  total_cnt Int
 
   // ディレクター
-  directorId   Int
-  director     User @relation(fields: [directorId], references: [id])
+  directorId String
+  director   User   @relation(fields: [directorId], references: [id])
 
   // relation
-  taskId       Int
-  task         Tasks @relation(fields: [taskId], references: [id])
+  taskId String
+  task   Tasks  @relation(fields: [taskId], references: [id])
 
   // 閲覧履歴 多対多
-  reporViewers        User[] @relation("ReportViewers")  // レポート閲覧履歴管理
+  reporViewers User[] @relation("ReportViewers") // レポート閲覧履歴管理
 
   // datetime
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-  
 }
