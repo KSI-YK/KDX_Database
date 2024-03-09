@@ -1,15 +1,14 @@
 import Link from 'next/link'
 
 import { Container } from '@/components/Container'
-import { Logo } from '@/components/Logo'
-import { NavLink } from '@/components/NavLink'
+import { NavLink } from '@/components/layouts/NavLink'
 
 export function Footer() {
   return (
-    <footer className="bg-slate-50">
+    <footer className="bg-slate-100">
       <Container>
-        <div className="py-8">
-          <nav className="mt-10 text-sm" aria-label="quick links">
+        <div className="py-0">
+          <nav className="mt-4 text-sm" aria-label="quick links">
             <div className="-my-1 flex justify-center gap-x-6">
               <NavLink href="/">Home</NavLink>
             </div>

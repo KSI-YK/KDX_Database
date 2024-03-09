@@ -1,9 +1,6 @@
-import Header from '@/components/Header';
-import { Footer } from '@/components/Footer';
-import UserList from '@/components/user/UserList';
-import CreateUser from '@/components/user/CreateUser';
-
-
+import Header from '@/components/layouts/Header';
+import { Footer } from '@/components/layouts/Footer';
+import SystemList from '@/components/system/SystemList';
 
 interface User {
   id: number;
@@ -21,7 +18,7 @@ const Home: React.FC<HomeProps> = ({ users }) => {
     <>
       <Header />
       <main>
-        <UserList />
+        <SystemList />
       </main>
       <Footer />
     </>

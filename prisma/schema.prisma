@@ -27,6 +27,8 @@ model Departments {
   name      String      @unique
   user      User[]
   taskTypes TaskTypes[]
+  @@map("departments")
+
 }
 
 model TaskTypes {
@@ -37,6 +39,8 @@ model TaskTypes {
   departmentId String
   department   Departments @relation(fields: [departmentId], references: [id])
   tasks        Tasks[]
+
+  @@map("taskTypes")
 }
 
 // 認証用アカウント
@@ -83,6 +87,8 @@ model UserTypes {
   name        String @unique
   user        User[]
 
+  @@map("userTypes")
+
 }
 
 // ユーザータイプ
@@ -91,6 +97,7 @@ model UserPosts {
   name        String @unique
   user        User[]
 
+  @@map("userPosts")
 }
 
 // ユーザー
@@ -128,6 +135,8 @@ model User {
   manageProjects Projects[] @relation("ProjectManagers") // プロジェクト担当者
   managers       Tasks[]    @relation("TaskManagers")
   viewReports    Reports[]  @relation("ReportViewers") // レポート閲覧履歴管理
+
+  @@map("users")
 }
 
 // クライアント
@@ -141,6 +150,9 @@ model Clients {
   // datetime
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("clients")
+
 }
 
 // システムテーブルの定義
@@ -148,7 +160,7 @@ model Systems {
   id        String  @id @default(cuid())
   name      String
   model     String?
-  total_cnt Int
+  total_cnt String?
 
   // relation
   clientId String
@@ -161,6 +173,8 @@ model Systems {
   // datetime
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("systems")
 }
 
 // デバイス
@@ -181,6 +195,8 @@ model Devices {
   // datetime
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("devices")
 }
 
 // プロジェクト種別
@@ -188,6 +204,8 @@ model ProjectTypes {
   id       String     @id @default(cuid())
   name     String     @unique
   projects Projects[]
+
+  @@map("projectTypes")
 }
 
 // ステータス
@@ -198,12 +216,18 @@ model Status {
   // relation
   projects Projects[]
   tasks    Tasks[]
+
+  @@map("status")
 }
 
 // プロジェクト
 model Projects {
   id   String @id @default(cuid())
   name String
+
+  startDate DateTime?
+  limitDate DateTime?
+  endDate DateTime?
 
   // 状態
   statusId String
@@ -228,14 +252,18 @@ model Projects {
   // datetime
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+  
+  @@map("projects")
+
 }
 
 // タスク
 model Tasks {
   id        String @id @default(cuid())
   name      String
-  model     String
-  total_cnt Int
+  startDate DateTime?
+  limitDate DateTime?
+  endDate DateTime?
 
   // 状態
   statusId String
@@ -258,14 +286,17 @@ model Tasks {
   // datetime
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("tasks")
 }
 
 // レポート
 model Reports {
   id        String @id @default(cuid())
   name      String
-  model     String
-  total_cnt Int
+  reportPath String?
+  zipPath String?
+  checkedAt DateTime?
 
   // ディレクター
   directorId String
@@ -281,4 +312,6 @@ model Reports {
   // datetime
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("reports")
 }

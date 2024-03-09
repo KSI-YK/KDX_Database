@@ -74,9 +74,7 @@ export const options: NextAuthOptions = {
 
     // コールバックの設定
     callbacks: {
-        jwt: async ({token, user, account, profile, isNewUser}) => {
-            // 注意: トークンをログ出力してはダメです。
-            console.log('in jwt', {user, token, account, profile})
+        jwt: async ({token, user, account, profile}) => {
 
             if (user) {
                 token.user = user;
@@ -101,7 +99,6 @@ export const options: NextAuthOptions = {
         },
 
         session: ({ session, token }) => {
-            console.log("in session", {session, token});
             token.accessToken
             return {
                 ...session,

@@ -1,4 +1,4 @@
-import { Inter, Lexend } from 'next/font/google'
+import { Inter, Lexend, Zen_Tokyo_Zoo } from 'next/font/google'
 import clsx from 'clsx'
 
 import '@/styles/tailwind.css'

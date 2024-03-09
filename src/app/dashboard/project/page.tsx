@@ -1,8 +1,7 @@
 import Header from '@/components/layouts/Header';
 import { Footer } from '@/components/layouts/Footer';
-import UserList from '@/components/user/UserList';
-import CreateUser from '@/components/user/CreateUser';
-import { Hero } from '@/components/Hero';
+import CreateProject from '@/components/project/CreateProject'
+import ProjectList from '@/components/project/ProjectList'
 
 
 
@@ -22,7 +21,7 @@ const Home: React.FC<HomeProps> = ({ users }) => {
     <>
       <Header />
       <main>
-        <Hero />
+        <ProjectList />
       </main>
       <Footer />
     </>

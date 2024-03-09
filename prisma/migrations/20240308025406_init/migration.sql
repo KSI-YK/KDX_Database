@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Systems" ALTER COLUMN "total_cnt" DROP NOT NULL,
+ALTER COLUMN "total_cnt" SET DATA TYPE TEXT;
