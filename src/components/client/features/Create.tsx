@@ -21,7 +21,7 @@ const addClient = async (
     return res.json();
 }
 
-const Page = async () => {
+const Page = () => {
     const router = useRouter();
     // 入力をフックスで監視
     const nameRef = useRef<HTMLInputElement | null>(null);

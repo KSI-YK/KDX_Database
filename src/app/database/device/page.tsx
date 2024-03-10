@@ -4,7 +4,7 @@ import { Footer } from '@/components/layouts/Footer';
 import { Container } from '@/components/Container';
 import { useEffect, useState } from 'react';
 import { Clients } from '@prisma/client';
-import * as Client from '@/components/client/index';
+import * as Device from '@/components/device/index';
 
 const SearchComponent: React.FC = () => {
 
@@ -31,7 +31,7 @@ const SearchComponent: React.FC = () => {
     const fetchUsers = async () => {
       const response = await fetch('http://localhost:3000/api/clients');
       const data = await response.json();
-      console.log(data.clients);
+      console.log(data.client);
       setSearchResults(data.clients); // フェッチしたデータをステートに設定
     };
 
@@ -72,7 +72,7 @@ const SearchComponent: React.FC = () => {
         </Container>
 
         {/* リストのコンポーネントを常時更新 */}
-        <Client.List searchResults={searchResults} />
+        <Device.List searchResults={searchResults} />
       </main>
       <Footer />
     </>

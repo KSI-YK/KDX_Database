@@ -12,7 +12,6 @@ interface SearchResultsListProps {
 };
 
 const SearchResultsList: React.FC<SearchResultsListProps> = ({ searchResults }) => {
-  console.log(searchResults)
   return (
     <Container className="pb-2 pt-20 lg:pt-6">
 
@@ -47,14 +46,12 @@ const SearchResultsList: React.FC<SearchResultsListProps> = ({ searchResults }) 
                   <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                 </div>
                 <p className="text-xs leading-5 text-gray-500">
-                  {/* {new Date(result.updatedAt).toDateString()} */}
                   {new Date(result.updatedAt).toLocaleDateString('ja-JP', {
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric',
                     weekday: 'long', // これは曜日を表示する場合に追加します
                   })}
-
                 </p>
               </div>
             </div>

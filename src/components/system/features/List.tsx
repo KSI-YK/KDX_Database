@@ -1,14 +1,20 @@
 "use client";
 
 import React from 'react';
-import { Clients } from '@prisma/client';
+import { Clients, Systems, User } from '@prisma/client';
 import { Container } from '@/components/Container';
 import Link from 'next/link';
 import { Button } from '@/components/Button';
 
+// System モデルに関連付けられた Client モデルのデータを含む
+type SystemWith = Systems & {
+  client: Clients;
+} & {
+  director: User;
+};
 
 interface SearchResultsListProps {
-  searchResults: Clients[];
+  searchResults: SystemWith[];
 };
 
 const SearchResultsList: React.FC<SearchResultsListProps> = ({ searchResults }) => {
@@ -19,7 +25,7 @@ const SearchResultsList: React.FC<SearchResultsListProps> = ({ searchResults }) 
       {/* 新規追加ボタン */}
       <div className="flex flex-row-reverse my-4">
         <div>
-          <Button href="/database/client/add" className='sticky top-1'>
+          <Button href="/database/system/add" className='sticky top-1'>
             新規追加
           </Button>
         </div>
@@ -33,12 +39,13 @@ const SearchResultsList: React.FC<SearchResultsListProps> = ({ searchResults }) 
               {/* <img className="h-12 w-12 flex-none rounded-full bg-gray-50" src={person.imageUrl} alt="" /> */}
               <div className="min-w-0 flex-auto">
                 <p className="text-sm font-semibold leading-6 text-gray-900">{result.name}</p>
-                {/* <p className="mt-1 truncate text-xs leading-5 text-gray-500">{result.email}</p> */}
+                <p className="mt-1 truncate text-xs leading-5 text-gray-500">Client:{result.client.name}/Director:{result.director.name}</p>
+
               </div>
             </div>
             <div className="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
               <p className="text-sm leading-6 text-gray-900">
-                <Link href={`/database/client/edit/${result.id}`}>
+                <Link href={`/database/system/edit/${result.id}`}>
                   編集
                 </Link>
               </p>
@@ -47,7 +54,6 @@ const SearchResultsList: React.FC<SearchResultsListProps> = ({ searchResults }) 
                   <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                 </div>
                 <p className="text-xs leading-5 text-gray-500">
-                  {/* {new Date(result.updatedAt).toDateString()} */}
                   {new Date(result.updatedAt).toLocaleDateString('ja-JP', {
                     year: 'numeric',
                     month: 'long',

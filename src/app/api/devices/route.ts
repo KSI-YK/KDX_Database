@@ -1,14 +1,6 @@
 import prisma from '@/app/lib/prisma';
 import { NextResponse } from 'next/server';
 
-// クライアントの型を定義（データベースのスキーマに応じて変更）
-// interface Client {
-//   id: string;
-//   name: string;
-//   createdAt: Date;
-//   updatedAt: Date;
-// }
-
 export async function main() {
   try {
     await prisma.$connect();
@@ -21,13 +13,8 @@ export async function main() {
 export const GET = async (req: Request, res: NextResponse) => {
   try {
     await main();
-    const systems = await prisma.systems.findMany({
-        include: {
-          director: true,
-          client: true,
-        },
-      });
-    return NextResponse.json({message: "Success", systems}, {status: 200});
+    const devices = await prisma.devices.findMany();
+    return NextResponse.json({message: "Success", devices}, {status: 200});
   } catch (err) {
     return NextResponse.json({message: "Error"}, {status: 500});
   } finally {
@@ -37,13 +24,14 @@ export const GET = async (req: Request, res: NextResponse) => {
 
 export const POST = async (req: Request, res: NextResponse) => {
   try {
-    const {name, model, total_cnt, clientId, directorId} = await req.json();
+    const {name,  } = await req.json();
     await main();
-    const systems = await prisma.systems.create({data: {name, model, total_cnt, clientId, directorId}});
-    return NextResponse.json({message: "Success", systems}, {status: 201});
+    const devices = await prisma.clients.create({data: {name}});
+    return NextResponse.json({message: "Success", devices}, {status: 201});
   } catch (err) {
     return NextResponse.json({message: "Error"}, {status: 500});
   } finally {
     await prisma.$disconnect();
   }
 };
+

@@ -41,7 +41,7 @@ const deleteClientById = async (id: string) => {
     return (await res).json();
 };
 
-const Page = ({ params }: { params: { id: string } }) => {
+const Page = async ({ params }: { params: { id: string } }) => {
     // リロード用のインスタンス
     const router = useRouter();
     // 入力をフックスで監視
@@ -50,12 +50,13 @@ const Page = ({ params }: { params: { id: string } }) => {
     // 編集ボタンを押した際の処理で、RefをaddClient(apiに投げる)
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (nameRef.current) {
-            await editClient(params.id, nameRef.current.value);
-            // リロード
-            router.push("/database/client");
-            router.refresh();
-        }
+        await editClient(
+            params.id,
+            nameRef.current?.value
+        );
+        // リロード
+        router.push("/database/client");
+        router.refresh();
     };
 
     // 削除ボタンを押した際の処理
@@ -69,16 +70,16 @@ const Page = ({ params }: { params: { id: string } }) => {
     // 初回読み出し時に、Inputに値を入力する
     useEffect(() => {
         const fetchData = async () => {
-            try {
-                const data = await getClientById(params.id);
-                nameRef.current!.value = data.name;
-            } catch (err) {
-                console.error(err);
-            }
+          try {
+            const data = await getClientById(params.id);
+            nameRef.current!.value = data.name;
+          } catch (err) {
+            console.error(err);
+          }
         };
-
+      
         fetchData();
-    }, []); // 依存配列が空なので、コンポーネントがマウントされた時に1回だけ実行されます。
+      }, []); // 依存配列が空なので、コンポーネントがマウントされた時に1回だけ実行されます。
 
     // html生成
     return (
