@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
 import React from "react";
 import { Container } from '@/components/Container'
 import { useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Toaster, toast } from "react-hot-toast";
+import { Button } from "@/components/Button";
 
 // ユーザー追加処理
 const addClient = async (
@@ -29,9 +29,7 @@ const Page = async () => {
     // ボタンを押した際の処理で、RefをaddClient(apiに投げる)
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        toast.loading("Sending Request 🚀", { id: "1" });
         await addClient(nameRef.current?.value);
-        toast.success("Posted Successfully", { id: "1" });
         // reload
         router.push("/database/client");
         router.refresh();
@@ -40,18 +38,24 @@ const Page = async () => {
     // html生成
     return (
         <Container className="pb-2 pt-20 lg:pt-6">
-            <Toaster />
-            <div className="sm:flex sm:items-center">
-                <div className="sm:flex-auto">
-                    <h1 className="text-base font-semibold leading-6 text-gray-900">
-                        新規登録/Client
-                    </h1>
+
+            <div className="space-y-4">
+                <div className="sm:flex sm:items-center">
+                    <div className="sm:flex-auto">
+                        <div className="border-b border-gray-900/10 pb-4 pt-4">
+                            <h1 className="text-base font-semibold leading-6 text-gray-900">新規登録/Clients</h1>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div className="sm:flex sm:items-center">
+
+                {/* 検索フォーム */}
                 <form onSubmit={handleSubmit}>
-                    <div className="sm:flex sm:items-center">
-                        <div className="mt-2">
+                    <div className="grid grid-cols-4 gap-4">
+                        <div className="col-span-1">
+                            <h1 className="text-base font-semibold leading-6 text-gray-900">企業名/Name</h1>
+                        </div>
+
+                        <div className="col-span-3">
                             <input
                                 type="text"
                                 ref={nameRef}
@@ -62,14 +66,16 @@ const Page = async () => {
                                 placeholder="金森メタル"
                             />
                         </div>
-                        <div className="mt-2 sm:ml-16 sm:mt-0 sm:flex-none">
-                            <button
-                                type="submit"
-                                className="rounded-md bg-indigo-600 mx-2 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
 
+                    </div>
+
+                    <div className="flex flex-row-reverse my-4">
+                        <div>
+                            <Button
+                                type="submit"
                             >
                                 登録
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 </form>

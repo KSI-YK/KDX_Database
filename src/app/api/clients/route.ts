@@ -3,14 +3,6 @@
 import prisma from '@/app/lib/prisma';
 import { NextResponse } from 'next/server';
 
-// クライアントの型を定義（データベースのスキーマに応じて変更）
-interface Client {
-  id: string;
-  name: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
 export async function main() {
   try {
     await prisma.$connect();
