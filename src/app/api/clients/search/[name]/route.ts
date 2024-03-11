@@ -9,7 +9,6 @@ export const GET = async (req: Request, res: NextResponse) => {
     try {
         const searchNameEncoded = req.url.split("/clients/search/")[1];
         const searchName = decodeURIComponent(searchNameEncoded);
-        console.log(searchName)
         await main();
         const clients = await prisma.clients.findMany({
             where: {

@@ -1,20 +1,25 @@
-"use client";
-
 import Header from '@/components/layouts/Header';
 import { Footer } from '@/components/layouts/Footer';
-import * as Client from '@/components/client/index';
+import * as System from '@/components/system/index';
+import prisma from '@/app/lib/prisma';
 
-const ClientPage = ({ params }: { params: { id: string } }) => {
-    const clientID = params.id
+
+export default async function ClientPage({ params }: { params: { id: string } }) {
+    const systemID = params.id
+    const clients = await prisma.clients.findMany();
+    const user = await prisma.user.findMany();
+
     return (
         <>
             <Header />
             <main>
-                <Client.Edit params={{ id: clientID }} />
+                <System.Edit 
+                    id={systemID}
+                    clients={clients}
+                    user={user}
+                />
             </main>
             <Footer />
         </>
     );
 };
-
-export default ClientPage;

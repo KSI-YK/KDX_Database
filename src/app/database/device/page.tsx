@@ -14,12 +14,10 @@ const SearchComponent: React.FC = () => {
   // 検索処理を行う関数　※入力変更のたびに呼び出されてしまう。検索ボタンの方が良いか？
   const handleSearch = async (searchTerm: string) => {
     let url = 'http://localhost:3000/api/clients';
-    console.log(searchTerm)
 
     // searchTermが空でない場合、検索用URLを使用
     if (searchTerm.trim() !== '') {
       url += `/search/${encodeURIComponent(searchTerm)}`;
-      console.log(url)
     }
     const response = await fetch(url);
     const data = await response.json();
@@ -31,7 +29,6 @@ const SearchComponent: React.FC = () => {
     const fetchUsers = async () => {
       const response = await fetch('http://localhost:3000/api/clients');
       const data = await response.json();
-      console.log(data.client);
       setSearchResults(data.clients); // フェッチしたデータをステートに設定
     };
 

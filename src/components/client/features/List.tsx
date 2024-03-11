@@ -12,7 +12,6 @@ interface SearchResultsListProps {
 };
 
 const SearchResultsList: React.FC<SearchResultsListProps> = ({ searchResults }) => {
-  console.log(searchResults)
   return (
     <Container className="pb-2 pt-20 lg:pt-6">
 
@@ -38,7 +37,7 @@ const SearchResultsList: React.FC<SearchResultsListProps> = ({ searchResults }) 
             </div>
             <div className="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
               <p className="text-sm leading-6 text-gray-900">
-                <Link href={`/database/client/edit/${result.id}`}>
+                <Link href={`/database/system/edit/${result.id}`}>
                   編集
                 </Link>
               </p>

@@ -14,7 +14,6 @@ const Page = async () => {
 
     // セッションからログイン情報を取得
     const session = await getServerSession(options)
-    console.log(session);
 
 
     // 部署名・ユーザータイプ・役職等の選択入力用にデータベースから取得
@@ -25,7 +24,6 @@ const Page = async () => {
     // ユーザー登録ボタンを押した際の処理
     const addUser = async (data: FormData) => {
         'use server';
-        console.log(data);
 
         // 従業員名称チェック
         const name: string = data.get('employeeName') as string;
@@ -50,8 +48,6 @@ const Page = async () => {
         const departmentId: string = data.get('department') as string;  // 部署
         const typeId: string = data.get('type') as string;              // ユーザータイプ
         const postId: string = data.get('post') as string;              // 役職
-
-        // console.log(departmentId);
 
         // prismaのクリエイトを使って、userテーブルにデータを追加
         await prisma.user.create({ data: { name, username, email, hashedPassword, departmentId, typeId, postId } });

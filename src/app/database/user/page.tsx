@@ -3,8 +3,6 @@ import { Footer } from '@/components/layouts/Footer';
 import UserList from '@/components/user/UserList';
 import CreateUser from '@/components/user/CreateUser';
 
-
-
 interface User {
   id: number;
   name: string;

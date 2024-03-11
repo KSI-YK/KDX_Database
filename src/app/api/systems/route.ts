@@ -26,6 +26,9 @@ export const GET = async (req: Request, res: NextResponse) => {
           director: true,
           client: true,
         },
+        orderBy: {
+          updatedAt: 'desc'
+        },
       });
     return NextResponse.json({message: "Success", systems}, {status: 200});
   } catch (err) {
