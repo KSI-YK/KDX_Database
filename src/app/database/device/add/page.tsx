@@ -1,17 +1,23 @@
 import Header from '@/components/layouts/Header';
 import { Footer } from '@/components/layouts/Footer';
-import * as Client from '@/components/client/index';
+import * as Device from '@/components/device/index';
+import prisma from '@/app/lib/prisma';
 
-const ClientPage = () => {
+
+export default async function ClientPage() {
+  const clients = await prisma.clients.findMany();
+  const user = await prisma.user.findMany();
+
   return (
     <>
       <Header />
       <main>
-        <Client.Create />
+          <Device.Create 
+            clients={clients}
+            user={user}
+          />
       </main>
       <Footer />
     </>
   );
 };
-
-export default ClientPage;

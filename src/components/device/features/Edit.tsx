@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Container } from '@/components/Container'
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/Button";
-import { Clients, User } from "@prisma/client";
+import { Clients, Devices, Systems, User } from "@prisma/client";
 import Select from 'react-select';
 
 interface Option {
@@ -12,25 +12,48 @@ interface Option {
     label: string;
 }
 
+// System モデルに関連付けられた Client モデルのデータを含む
+type deviceWithClient = (Devices & {
+    system: {
+        client: {
+            id: string;
+            name: string;
+            createdAt: Date;
+            updatedAt: Date;
+        };
+    } & {
+        id: string;
+        name: string;
+        model: string | null;
+        total_cnt: string | null;
+        clientId: string;
+        directorId: string;
+        createdAt: Date;
+        updatedAt: Date;
+    };
+  } & {director: User}
+  ) | null | undefined
+
 interface CreatePageProps {
-    clients: Clients[];
-    user: User[];
     id: string;
+    clientName: string | undefined;
+    systemName: string | undefined;
+    device: deviceWithClient;
+    users: User[];
 }
 
 // 編集処理
-const editSystem = async (
+const editDevice = async (
     id: string | undefined,
     name: string | undefined,
     model: string | undefined,
-    total_cnt: string | undefined,
-    clientId: string | undefined,
+    systemId: string | undefined,
     directorId: string | undefined
 ) => {
     // api
-    const res = await fetch(`http://localhost:3000/api/systems/${id}`, {
+    const res = await fetch(`http://localhost:3000/api/devices/${id}`, {
         method: "PUT",
-        body: JSON.stringify({ id, name, model, total_cnt, clientId, directorId }),
+        body: JSON.stringify({ id, name, model, systemId, directorId }),
         headers: {
             "Content-Type": "application/json",
         },
@@ -38,17 +61,9 @@ const editSystem = async (
     return res.json();
 }
 
-// 指定取得処理
-const getSystemById = async (id: string | undefined) => {
-    // api
-    const res = await fetch(`http://localhost:3000/api/systems/${id}`);
-    const data = await res.json();
-    return data.systems;
-};
-
 // 削除処理
-const deleteSystemById = async (id: string) => {
-    const res = fetch(`http://localhost:3000/api/systems/${id}`, {
+const deleteDeviceById = async (id: string) => {
+    const res = fetch(`http://localhost:3000/api/devices/${id}`, {
         method: "DELETE",
         headers: {
             "Content-Type": "application/json",
@@ -57,38 +72,25 @@ const deleteSystemById = async (id: string) => {
     return (await res).json();
 };
 
-const Page: React.FC<CreatePageProps> = ({ id, clients, user }) => {
+const Page: React.FC<CreatePageProps> = ({ id, clientName, systemName, users, device }) => {
     // リロード用のインスタンス
     const router = useRouter();
-    // clientsを適切な形式に変換
-    const clientOptions = clients.map(client => ({ value: client.id, label: client.name }));
-    const userOptions = user.map(user => ({ value: user.id, label: user.name }));
+    const userOptions = users.map(user => ({ value: user.id, label: user.name }));
     // 入力をフックスで監視
-    const [selectedClient, setClient] = useState<Option | null>(null);
     const [selectedDirector, setDirector] = useState<Option | null>(null);
-    const [systemName, setSystemName] = useState("");
-    const [systemModel, setSystemModel] = useState("");
-    const [systemTotalCnt, setSystemTotalCnt] = useState("");
-
-    console.log(selectedClient)
-
+    const [deviceName, setDeviceName] = useState("");
+    const [deviceModel, setDeviceModel] = useState("");
+    const systemId = device?.systemId;
 
     // 初回読み出し時に、Inputに値を入力する
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const data = await getSystemById(id);
-                console.log(data)
-                setSystemName(data.name);
-                setSystemModel(data.model);
-                setSystemTotalCnt(data.total_cnt);
-                setClient({
-                    value: data.clientId,
-                    label: data.client.name
-                });
+                setDeviceName(device?.name ?? "");
+                setDeviceModel(device?.model ?? "" );
                 setDirector({
-                    value: data.directorId,
-                    label: data.director.name
+                    value: device?.directorId ?? "",
+                    label: device?.director.name ?? ""
                 });
             } catch (err) {
                 console.error(err);
@@ -100,25 +102,25 @@ const Page: React.FC<CreatePageProps> = ({ id, clients, user }) => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (selectedClient && selectedDirector) {
-            await editSystem(
+        if (selectedDirector) {
+            console.log(deviceName)
+            await editDevice(
                 id,
-                systemName,
-                systemModel,
-                systemTotalCnt,
-                selectedClient.value,
-                selectedDirector.value
+                deviceName,
+                deviceModel,
+                systemId,
+                selectedDirector.value,
             );
-            router.push("/database/system");
+            router.push("/database/device");
             router.refresh
         }
     }
 
     // 削除ボタンを押した際の処理
     const handleDelete = async () => {
-        await deleteSystemById(id);
+        await deleteDeviceById(id);
         // リロード
-        router.push("/database/system");
+        router.push("/database/device");
         router.refresh();
     };
 
@@ -144,17 +146,33 @@ const Page: React.FC<CreatePageProps> = ({ id, clients, user }) => {
                         </div>
 
                         <div className="col-span-3">
-                            <p className="mt-1 truncate text-xs leading-5 text-gray-500">id:{selectedClient?.value}</p>
+                            <p className="mt-1 truncate text-xs leading-5 text-gray-500">{clientName}</p>
+                        </div>
 
-                            <Select
-                                className="basic-single text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                classNamePrefix="select"
-                                isSearchable={true}
-                                name="client"
-                                // defaultValueだとレンダリングタイミングが合わず、表示されない。
-                                value={selectedClient}
-                                options={clientOptions}
-                                onChange={setClient}
+                        {/* 設備選択 */}
+
+                        <div className="col-span-1">
+                            <h1 className="text-base leading-4 text-gray-900">設備名/System</h1>
+                        </div>
+
+                        <div className="col-span-3">
+                            <p className="mt-1 truncate text-xs leading-5 text-gray-500">{systemName}</p>
+                        </div>
+
+                        {/* 装置名入力 */}
+
+                        <div className="col-span-1">
+                            <h1 className="text-base leading-4 text-gray-900">装置名/Name</h1>
+                        </div>
+
+                        <div className="col-span-3">
+                            <input
+                                type="text"
+                                onChange={(e) => setDeviceName(e.target.value)}
+                                defaultValue={device?.name}
+                                autoComplete="username"
+                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                placeholder="KDM型造型機"
                             />
                         </div>
 
@@ -179,22 +197,7 @@ const Page: React.FC<CreatePageProps> = ({ id, clients, user }) => {
                             />
                         </div>
 
-                        {/* 設備名入力 */}
-
-                        <div className="col-span-1">
-                            <h1 className="text-base leading-4 text-gray-900">設備名/Name</h1>
-                        </div>
-
-                        <div className="col-span-3">
-                            <input
-                                type="text"
-                                onChange={(e) => setSystemName(e.target.value)}
-                                defaultValue={systemName}
-                                autoComplete="username"
-                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                placeholder="金森メタル"
-                            />
-                        </div>
+                        
 
                         {/* 型式入力 */}
 
@@ -205,25 +208,8 @@ const Page: React.FC<CreatePageProps> = ({ id, clients, user }) => {
                         <div className="col-span-3">
                             <input
                                 type="text"
-                                onChange={(e) => setSystemModel(e.target.value)}
-                                defaultValue={systemModel}
-                                autoComplete="username"
-                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                placeholder="金森メタル"
-                            />
-                        </div>
-
-                        {/* トータルカウンタ入力 */}
-
-                        <div className="col-span-1">
-                            <h1 className="text-base leading-4 text-gray-900">トータルカウンタ/Total Cnt</h1>
-                        </div>
-
-                        <div className="col-span-3">
-                            <input
-                                type="text"
-                                onChange={(e) => setSystemTotalCnt(e.target.value)}
-                                defaultValue={systemTotalCnt}
+                                onChange={(e) => setDeviceModel(e.target.value)}
+                                defaultValue={device?.model ?? ""}
                                 autoComplete="username"
                                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                 placeholder="金森メタル"

@@ -4,13 +4,15 @@ import React, { useState } from "react";
 import { Container } from '@/components/Container'
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/Button";
-import { Clients, User } from '@prisma/client';
+import { Clients, Systems, User } from '@prisma/client';
 import Select from 'react-select';
 
 interface CreatePageProps {
     clients: Clients[];
     user: User[];
 }
+
+type system = Systems
 
 interface Option {
     value: string;
@@ -21,14 +23,13 @@ interface Option {
 const addSystem = async (
     name: string | undefined,
     model: string | undefined,
-    total_cnt: string | undefined,
-    clientId: string | undefined,
+    systemId: string | undefined,
     directorId: string | undefined
 ) => {
     // api
-    const res = await fetch(`http://localhost:3000/api/systems`, {
+    const res = await fetch(`http://localhost:3000/api/devices`, {
         method: "POST",
-        body: JSON.stringify({ name, clientId, directorId, model, total_cnt }),
+        body: JSON.stringify({ name, model, systemId, directorId}),
         headers: {
             "Content-Type": "application/json",
         },
@@ -36,27 +37,53 @@ const addSystem = async (
     return res.json();
 }
 
+// 指定取得処理
+const getSystemsForClient = async (id: string | undefined) => {
+    // api
+    const res = await fetch(`http://localhost:3000/api/systems/searchClientId/${id}`);
+    const data = await res.json();
+    return data.systems;
+};
+
 
 const CreatePage: React.FC<CreatePageProps> = ({ clients, user }) => {
     const router = useRouter();
     const [selectedClient, setSelectedClient] = useState<Option | null>(null);
+    const [selectedSystem, setSelectedSystem] = useState<Option | null>(null);
+    const [systemOptions, setSystemOptions] = useState<Option[]>([]);
+
     const [selectedDirector, setSelectedDirector] = useState<Option | null>(null);
     const [systemName, setSystemName] = useState("");
     const [systemModel, setSystemModel] = useState("");
-    const [systemTotalCnt, setSystemTotalCnt] = useState("");
+
+    const handleClientChange = async (selectedOption: Option | null) => {
+        setSelectedClient(selectedOption);
+        if (selectedOption) {
+            // 選択されたクライアントに基づいて利用可能なシステムを取得するAPIを呼び出すなど
+            // ここでは仮のロジックを示します。実際には、API呼び出しや、
+            // 既にフロントエンドにあるデータからフィルタリングするなどの方法が考えられます。
+            const systemsForSelectedClient = await getSystemsForClient(selectedOption.value);
+            const newSystemOptions = systemsForSelectedClient.map((system: Systems) => ({
+                value: system.id,
+                label: system.name
+            }));
+            setSystemOptions(newSystemOptions);
+        } else {
+            setSystemOptions([]);
+        }
+    };
 
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (selectedClient && selectedDirector) {
+        if (selectedSystem && selectedDirector) {
             await addSystem(
                 systemName,
                 systemModel,
-                systemTotalCnt,
-                selectedClient.value,
+                selectedSystem.value,
                 selectedDirector.value
         );
-            router.push("/database/system");
+            router.push("/database/device");
             router.refresh
         }
     }
@@ -96,14 +123,15 @@ const CreatePage: React.FC<CreatePageProps> = ({ clients, user }) => {
                                 isSearchable={true}
                                 name="client"
                                 options={clientOptions}
-                                onChange={setSelectedClient}
+                                onChange={handleClientChange} // ここを更新
                             />
                         </div>
 
-                        {/* 責任者選択 */}
+                        {/* 設備名選択 */}
 
                         <div className="col-span-1">
-                            <h1 className="text-base leading-4 text-gray-900">責任者/Director</h1>
+                            <h1 className="text-base leading-4 text-gray-900">装置名/System</h1>
+
                         </div>
 
                         <div className="col-span-3">
@@ -111,9 +139,9 @@ const CreatePage: React.FC<CreatePageProps> = ({ clients, user }) => {
                                 className="basic-single text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                 classNamePrefix="select"
                                 isSearchable={true}
-                                name="director"
-                                options={userOptions}
-                                onChange={setSelectedDirector}
+                                name="client"
+                                options={systemOptions}
+                                onChange={setSelectedSystem}
                             />
                         </div>
 
@@ -135,6 +163,23 @@ const CreatePage: React.FC<CreatePageProps> = ({ clients, user }) => {
                             />
                         </div>
 
+                        {/* 責任者選択 */}
+
+                        <div className="col-span-1">
+                            <h1 className="text-base leading-4 text-gray-900">責任者/Director</h1>
+                        </div>
+
+                        <div className="col-span-3">
+                            <Select
+                                className="basic-single text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                classNamePrefix="select"
+                                isSearchable={true}
+                                name="director"
+                                options={userOptions}
+                                onChange={setSelectedDirector}
+                            />
+                        </div>
+
                         {/* 型式入力 */}
 
                         <div className="col-span-1">
@@ -152,26 +197,6 @@ const CreatePage: React.FC<CreatePageProps> = ({ clients, user }) => {
                                 placeholder="金森メタル"
                             />
                         </div>
-
-                        {/* トータルカウンタ入力 */}
-
-                        <div className="col-span-1">
-                            <h1 className="text-base leading-4 text-gray-900">トータルカウンタ/Total Cnt</h1>
-                        </div>
-
-                        <div className="col-span-3">
-                            <input
-                                type="text"
-                                onChange={(e) => setSystemTotalCnt(e.target.value)}
-                                name="name"
-                                id="name"
-                                autoComplete="username"
-                                defaultValue={0}
-                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                placeholder="金森メタル"
-                            />
-                        </div>
-
                     </div>
 
                     <div className="flex flex-row-reverse my-4">

@@ -24,7 +24,6 @@ import Link from 'next/link'
 
 
 const projects = [
-  { name: 'クライアント管理', description: '客先情報の追加、変更', href: '/database/client', icon: BuildingOffice2Icon },
   { name: 'プロジェクト管理', description: 'プロジェクト・作番情報の追加、変更、進捗管理', href: '/project', icon: BriefcaseIcon },
   { name: 'タスク管理', description: 'タスク・出張情報の追加、変更、進捗管理', href: '/system', icon: QueueListIcon },
   { name: '報告書提出', description: '出張報告書の提出', href: '#', icon: ClipboardDocumentCheckIcon },
@@ -32,9 +31,9 @@ const projects = [
 ]
 
 const database = [
-  { name: 'クライアント', description: '客先情報', href: '/database/client', icon: BuildingOffice2Icon },
-  { name: 'システム', description: '設備情報', href: '/database/system', icon: BriefcaseIcon },
-  { name: 'デバイス', description: '装置情報', href: '/system', icon: QueueListIcon },
+  { name: 'クライアント', description: '客先情報の検索、追加、編集、削除', href: '/database/client', icon: BuildingOffice2Icon },
+  { name: 'システム', description: '設備情報の検索、追加、編集、削除', href: '/database/system', icon: BriefcaseIcon },
+  { name: 'デバイス', description: '装置情報の検索、追加、編集、削除', href: '/database/device', icon: QueueListIcon },
   { name: 'プロジェクト', description: 'プロジェクトの一覧', href: '#', icon: ClipboardDocumentCheckIcon },
   { name: 'タスク', description: 'タスクの一覧', href: '/database/user', icon: UserCircleIcon },
   { name: '報告書', description: '報告書の一覧', href: '/database/user', icon: UserCircleIcon },

@@ -70,15 +70,11 @@ const Page: React.FC<CreatePageProps> = ({ id, clients, user }) => {
     const [systemModel, setSystemModel] = useState("");
     const [systemTotalCnt, setSystemTotalCnt] = useState("");
 
-    console.log(selectedClient)
-
-
     // 初回読み出し時に、Inputに値を入力する
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const data = await getSystemById(id);
-                console.log(data)
                 setSystemName(data.name);
                 setSystemModel(data.model);
                 setSystemTotalCnt(data.total_cnt);
@@ -246,6 +242,7 @@ const Page: React.FC<CreatePageProps> = ({ id, clients, user }) => {
                                 type="button"
                                 onClick={handleDelete}
                                 className="bg-red-500"
+
                             >
                                 削除
                             </Button>
