@@ -66,7 +66,7 @@ const SearchComponent: React.FC = () => {
             <div className="sm:flex sm:items-center">
               <div className="sm:flex-auto">
                 <div className="border-b border-gray-900/10 pb-4 pt-4">
-                  <h1 className="text-base font-semibold leading-6 text-gray-900">検索/Systems</h1>
+                  <h1 className="text-base font-semibold leading-6 text-gray-900 dark:text-slate-200">検索/Systems</h1>
                 </div>
               </div>
             </div>
@@ -74,7 +74,7 @@ const SearchComponent: React.FC = () => {
             {/* 検索フォーム */}
             <div className="grid grid-cols-4 gap-4">
               <div className="col-span-1">
-                <h2 className="text-base text-gray-900">企業名/Client</h2>
+                <h2 className="text-base text-gray-900 dark:text-slate-200">企業名/Client</h2>
 
               </div>
 
@@ -83,13 +83,13 @@ const SearchComponent: React.FC = () => {
                   type="text"
                   onChange={(e) => handleSearch(e.target.value)}
                   ref={clientRef}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-slate-200 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                   placeholder="検索..."
                 />
               </div>
 
               <div className="col-span-1">
-                <h2 className="text-base text-gray-900">責任者/Director</h2>
+                <h2 className="text-base text-gray-900 dark:text-slate-200">責任者/Director</h2>
 
               </div>
 
@@ -98,13 +98,13 @@ const SearchComponent: React.FC = () => {
                   type="text"
                   onChange={(e) => handleSearch(e.target.value)}
                   ref={directorRef}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-slate-200 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                   placeholder="検索..."
                 />
               </div>
 
               <div className="col-span-1">
-                <h2 className="text-base text-gray-900">設備名/System Name</h2>
+                <h2 className="text-base text-gray-900 dark:text-slate-200">設備名/System Name</h2>
 
               </div>
 
@@ -113,13 +113,13 @@ const SearchComponent: React.FC = () => {
                   type="text"
                   onChange={(e) => handleSearch(e.target.value)}
                   ref={systemRef}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-slate-200 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                   placeholder="検索..."
                 />
               </div>
 
               <div className="col-span-1">
-                <h2 className="text-base text-gray-900">装置名/Device Name</h2>
+                <h2 className="text-base text-gray-900 dark:text-slate-200">装置名/Device Name</h2>
 
               </div>
 
@@ -128,7 +128,7 @@ const SearchComponent: React.FC = () => {
                   type="text"
                   onChange={(e) => handleSearch(e.target.value)}
                   ref={deviceRef}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-slate-200 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                   placeholder="検索..."
                 />
               </div>

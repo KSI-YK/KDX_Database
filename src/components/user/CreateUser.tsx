@@ -74,7 +74,7 @@ const Page = async () => {
                         <div className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-gray-900/10 pb-12 md:grid-cols-3">
                             <div>
                                 <h3 className="text-base font-semibold leading-12 text-gray-900">基本情報</h3>
-                                <p className="mt-1 text-sm leading-6 text-gray-600">
+                                <p className="mt-1 text-sm leading-6 text-gray-600 dark:text-gray-100">
                                     従業員情報を入力してください。
                                 </p>
                             </div>
@@ -163,7 +163,7 @@ const Page = async () => {
                         <div className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-gray-900/10 pb-12 md:grid-cols-3 pt-4">
                             <div>
                                 <h3 className="text-base font-semibold leading-12 text-gray-900">サインイン情報</h3>
-                                <p className="mt-1 text-sm leading-6 text-gray-600">
+                                <p className="mt-1 text-sm leading-6 text-gray-600 dark:text-gray-100">
                                     サインイン用の情報を入力してください。パスワードを覚えておいてください。
                                 </p>
                             </div>
@@ -245,7 +245,7 @@ const Page = async () => {
                                     <div className="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10">
                                         <div className="text-center">
                                             <PhotoIcon className="mx-auto h-12 w-12 text-gray-300" aria-hidden="true" />
-                                            <div className="mt-4 flex text-sm leading-6 text-gray-600">
+                                            <div className="mt-4 flex text-sm leading-6 text-gray-600 dark:text-gray-100">
                                                 <label
                                                     htmlFor="file-upload"
                                                     className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
@@ -255,7 +255,7 @@ const Page = async () => {
                                                 </label>
                                                 <p className="pl-1">or drag and drop</p>
                                             </div>
-                                            <p className="text-xs leading-5 text-gray-600">PNG, JPG, GIF up to 10MB</p>
+                                            <p className="text-xs leading-5 text-gray-600 dark:text-gray-100">PNG, JPG, GIF up to 10MB</p>
                                         </div>
                                     </div>
                                 </div>

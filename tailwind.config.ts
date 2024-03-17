@@ -34,4 +34,5 @@ export default {
     },
   },
   plugins: [formsPlugin, headlessuiPlugin,],
+  darkMode: 'class',
 } satisfies Config

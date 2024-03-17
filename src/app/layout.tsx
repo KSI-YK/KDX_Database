@@ -1,4 +1,5 @@
 import { Inter, Lexend, Zen_Tokyo_Zoo } from 'next/font/google'
+import { Providers } from './providers'
 import clsx from 'clsx'
 
 import '@/styles/tailwind.css'
@@ -34,12 +35,14 @@ export default function RootLayout({
     <html
       lang="ja"
       className={clsx(
-        'h-full scroll-smooth bg-white antialiased',
+        'h-full scroll-smooth dark:bg-slate-800 antialiased',
         inter.variable,
         lexend.variable,
       )}
     >
-      <body className="flex h-full flex-col">{children}</body>
+      <body className="flex h-full flex-col dark:bg-slate-800 dark:text-white">
+        <Providers>{children}</Providers>
+      </body>
     </html>
   )
 }

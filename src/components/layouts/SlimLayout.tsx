@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import backgroundImage from '@/images/background-auth.jpg'
+import backgroundImage from '@/images/background-auth.png'
 
 export function SlimLayout({ children }: { children: React.ReactNode }) {
   return (

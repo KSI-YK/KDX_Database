@@ -131,7 +131,7 @@ const Page: React.FC<CreatePageProps> = ({ id, clientName, systemName, users, de
                 <div className="sm:flex sm:items-center">
                     <div className="sm:flex-auto">
                         <div className="border-b border-gray-900/10 pb-4 pt-4">
-                            <h1 className="text-base font-semibold leading-6 text-gray-900">編集/Systems</h1>
+                            <h1 className="text-base font-semibold leading-6 text-gray-900 dark:text-slate-200">編集/Systems</h1>
                         </div>
                     </div>
                 </div>
@@ -142,7 +142,7 @@ const Page: React.FC<CreatePageProps> = ({ id, clientName, systemName, users, de
                         {/* 企業名選択 */}
 
                         <div className="col-span-1">
-                            <h1 className="text-base leading-4 text-gray-900">企業名/Client</h1>
+                            <h1 className="text-base leading-4 text-gray-900 dark:text-slate-200">企業名/Client</h1>
                         </div>
 
                         <div className="col-span-3">
@@ -152,7 +152,7 @@ const Page: React.FC<CreatePageProps> = ({ id, clientName, systemName, users, de
                         {/* 設備選択 */}
 
                         <div className="col-span-1">
-                            <h1 className="text-base leading-4 text-gray-900">設備名/System</h1>
+                            <h1 className="text-base leading-4 text-gray-900 dark:text-slate-200">設備名/System</h1>
                         </div>
 
                         <div className="col-span-3">
@@ -162,7 +162,7 @@ const Page: React.FC<CreatePageProps> = ({ id, clientName, systemName, users, de
                         {/* 装置名入力 */}
 
                         <div className="col-span-1">
-                            <h1 className="text-base leading-4 text-gray-900">装置名/Name</h1>
+                            <h1 className="text-base leading-4 text-gray-900 dark:text-slate-200">装置名/Name</h1>
                         </div>
 
                         <div className="col-span-3">
@@ -171,7 +171,7 @@ const Page: React.FC<CreatePageProps> = ({ id, clientName, systemName, users, de
                                 onChange={(e) => setDeviceName(e.target.value)}
                                 defaultValue={device?.name}
                                 autoComplete="username"
-                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-slate-200 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                 placeholder="KDM型造型機"
                             />
                         </div>
@@ -179,14 +179,14 @@ const Page: React.FC<CreatePageProps> = ({ id, clientName, systemName, users, de
                         {/* 責任者選択 */}
 
                         <div className="col-span-1">
-                            <h1 className="text-base leading-4 text-gray-900">責任者/Director</h1>
+                            <h1 className="text-base leading-4 text-gray-900 dark:text-slate-200">責任者/Director</h1>
                         </div>
 
                         <div className="col-span-3">
                             <p className="mt-1 truncate text-xs leading-5 text-gray-500">id:{selectedDirector?.value}</p>
 
                             <Select
-                                className="basic-single text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                className="basic-single text-gray-900 dark:text-slate-200 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                 classNamePrefix="select"
                                 isSearchable={true}
                                 name="director"
@@ -202,7 +202,7 @@ const Page: React.FC<CreatePageProps> = ({ id, clientName, systemName, users, de
                         {/* 型式入力 */}
 
                         <div className="col-span-1">
-                            <h1 className="text-base leading-4 text-gray-900">型式/Model</h1>
+                            <h1 className="text-base leading-4 text-gray-900 dark:text-slate-200">型式/Model</h1>
                         </div>
 
                         <div className="col-span-3">
@@ -211,7 +211,7 @@ const Page: React.FC<CreatePageProps> = ({ id, clientName, systemName, users, de
                                 onChange={(e) => setDeviceModel(e.target.value)}
                                 defaultValue={device?.model ?? ""}
                                 autoComplete="username"
-                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-slate-200 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                 placeholder="金森メタル"
                             />
                         </div>

@@ -2,23 +2,27 @@ import Link from 'next/link'
 
 import { Container } from '@/components/Container'
 import { NavLink } from '@/components/layouts/NavLink'
+import { ThemeSwitch } from './ThemaSwitch'
 
 export function Footer() {
   return (
-    <footer className="bg-slate-100">
+    <footer className="bg-slate-100 dark:bg-slate-900">
       <Container>
-        <div className="py-0">
+        {/* <div className="py-0">
           <nav className="mt-4 text-sm" aria-label="quick links">
             <div className="-my-1 flex justify-center gap-x-6">
               <NavLink href="/">Home</NavLink>
             </div>
           </nav>
-        </div>
-        <div className="flex flex-col items-center border-t border-slate-400/10 py-10 sm:flex-row-reverse sm:justify-between">
-          <div className="flex gap-x-6">
+        </div> */}
+        <div className="flex flex-col items-center py-10 sm:flex-row-reverse sm:justify-between " >
+          <div className="flex gap-x-6 items-center">
+            <div>
+              <ThemeSwitch />
+            </div>
             <Link href="https://github.com/HayatoShimada/salient-ts" className="group" aria-label="TaxPal on GitHub">
               <svg
-                className="h-6 w-6 fill-slate-500 group-hover:fill-slate-700"
+                className="h-8 w-8 fill-slate-500 group-hover:fill-slate-700"
                 aria-hidden="true"
                 viewBox="0 0 24 24"
               >
@@ -26,10 +30,12 @@ export function Footer() {
               </svg>
             </Link>
           </div>
-          <p className="mt-6 text-sm text-slate-500 sm:mt-0">
-            Copyright &copy; {new Date().getFullYear()} KANAMORI SYSTEM Inc. All rights
-            reserved.
-          </p>
+          <div>
+            <p className="mt-6 text-sm text-slate-500 sm:mt-0">
+              Copyright &copy; {new Date().getFullYear()} KANAMORI SYSTEM Inc. All rights
+              reserved.
+            </p>
+          </div>
         </div>
       </Container>
     </footer>
