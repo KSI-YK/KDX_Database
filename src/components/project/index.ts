@@ -1,5 +1,7 @@
-import Dashboard from "./features/dashboard";
+import Dashboard from "./features/Dashboard";
+import List from "./features/List";
+import Create from "./features/Create";
+import Edit from "./features/Edit";
 
 
-
-export {Dashboard};
+export {Dashboard, List, Create, Edit};

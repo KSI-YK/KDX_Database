@@ -27,8 +27,8 @@ model Departments {
   name      String      @unique
   user      User[]
   taskTypes TaskTypes[]
-  @@map("departments")
 
+  @@map("departments")
 }
 
 model TaskTypes {
@@ -83,19 +83,18 @@ model VerificationToken {
 
 // ユーザータイプ
 model UserTypes {
-  id          String @id @default(cuid())
-  name        String @unique
-  user        User[]
+  id   String @id @default(cuid())
+  name String @unique
+  user User[]
 
   @@map("userTypes")
-
 }
 
 // ユーザータイプ
 model UserPosts {
-  id          String @id @default(cuid())
-  name        String @unique
-  user        User[]
+  id   String @id @default(cuid())
+  name String @unique
+  user User[]
 
   @@map("userPosts")
 }
@@ -104,7 +103,7 @@ model UserPosts {
 model User {
   id             String    @id @default(cuid())
   name           String
-  username       String    @unique//ログイン用ユーザーネーム
+  username       String    @unique //ログイン用ユーザーネーム
   email          String?   @unique
   emailVerified  DateTime?
   image          String?
@@ -125,16 +124,18 @@ model User {
   post   UserPosts @relation(fields: [postId], references: [id])
 
   // ディレクターID 1対多
-  systems  Systems[]
-  devices  Devices[]
-  projects Projects[]
-  tasks    Tasks[]
-  reports  Reports[]
+  systems       Systems[]
+  devices       Devices[]
+  projects      Projects[]
+  directedTasks Tasks[]    @relation("TaskDirector")
+  createdTasks  Tasks[]    @relation("TaskCreator")
+  reports       Reports[]
 
   // 多対多
   manageProjects Projects[] @relation("ProjectManagers") // プロジェクト担当者
   managers       Tasks[]    @relation("TaskManagers")
   viewReports    Reports[]  @relation("ReportViewers") // レポート閲覧履歴管理
+  Tasks          Tasks[]
 
   @@map("users")
 }
@@ -152,7 +153,6 @@ model Clients {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("clients")
-
 }
 
 // システムテーブルの定義
@@ -227,7 +227,7 @@ model Projects {
 
   startDate DateTime?
   limitDate DateTime?
-  endDate DateTime?
+  endDate   DateTime?
 
   // 状態
   statusId String
@@ -252,18 +252,17 @@ model Projects {
   // datetime
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-  
-  @@map("projects")
 
+  @@map("projects")
 }
 
 // タスク
 model Tasks {
-  id        String @id @default(cuid())
+  id        String    @id @default(cuid())
   name      String
   startDate DateTime?
   limitDate DateTime?
-  endDate DateTime?
+  endDate   DateTime?
 
   // 状態
   statusId String
@@ -271,7 +270,11 @@ model Tasks {
 
   // ディレクター
   directorId String
-  director   User   @relation(fields: [directorId], references: [id])
+  director   User   @relation("TaskDirector", fields: [directorId], references: [id])
+
+  // 任命者
+  creatorId String?
+  creator   User?   @relation("TaskCreator", fields: [creatorId], references: [id])
 
   // relation
   projectId String
@@ -286,17 +289,19 @@ model Tasks {
   // datetime
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+  User      User?    @relation(fields: [userId], references: [id])
+  userId    String?
 
   @@map("tasks")
 }
 
 // レポート
 model Reports {
-  id        String @id @default(cuid())
-  name      String
+  id         String    @id @default(cuid())
+  name       String
   reportPath String?
-  zipPath String?
-  checkedAt DateTime?
+  zipPath    String?
+  checkedAt  DateTime?
 
   // ディレクター
   directorId String

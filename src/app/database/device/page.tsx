@@ -7,7 +7,7 @@ import { Clients, Devices, Systems, User } from '@prisma/client';
 import * as Device from '@/components/device/index';
 
 // System モデルに関連付けられた Client モデルのデータを含む
-type SystemWith = Devices & {
+type DeviceWith = Devices & {
   system: Systems & {
     client: Clients;
   }
@@ -18,7 +18,7 @@ type SystemWith = Devices & {
 const SearchComponent: React.FC = () => {
 
   // 入力をフックスで監視
-  const [searchResults, setSearchResults] = useState<SystemWith[]>([]);
+  const [searchResults, setSearchResults] = useState<DeviceWith[]>([]);
 
   const clientRef = useRef<HTMLInputElement | null>(null);
   const directorRef = useRef<HTMLInputElement | null>(null);

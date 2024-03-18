@@ -6,7 +6,7 @@ import { ThemeSwitch } from './ThemaSwitch'
 
 export function Footer() {
   return (
-    <footer className="bg-slate-100 dark:bg-slate-900">
+    <footer className="bg-slate-100 dark:bg-slate-950 mt-auto">
       <Container>
         {/* <div className="py-0">
           <nav className="mt-4 text-sm" aria-label="quick links">

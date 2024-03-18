@@ -23,20 +23,6 @@ import kdxIcon from '@/images/kdx_icon.svg'
 import Image from 'next/image'
 import Link from 'next/link'
 
-type ExtendedUser = {
-  user: {
-    name?: string | null
-    email?: string | null
-    image?: string | null
-    departmentId?: string | undefined // この行を追加
-  }
-}
-
-// 拡張されたセッションを使用する
-interface ExtendedSession {
-  user?: ExtendedUser
-}
-
 const projects = [
   {
     name: 'プロジェクト管理',
@@ -47,7 +33,7 @@ const projects = [
   {
     name: 'タスク管理',
     description: 'タスク・出張情報の追加、変更、進捗管理',
-    href: '/system',
+    href: '/project/task',
     icon: QueueListIcon,
   },
   {
@@ -174,7 +160,7 @@ function ClientHome() {
   }, [user?.departmentId]) // 依存配列内でuser.departmentIdを監視
 
   return (
-    <header className="bg-slate-100 dark:bg-slate-900">
+    <header className="bg-slate-100 dark:bg-slate-950 shadow-lg">
       <Container>
         <nav
           className="mx-auto flex items-center justify-between px-0 py-6"
