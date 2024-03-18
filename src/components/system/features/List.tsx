@@ -31,19 +31,19 @@ const SearchResultsList: React.FC<SearchResultsListProps> = ({ searchResults }) 
       </div>
 
       {/* クライアントリスト */}
-      <ul role="list" className="divide-y divide-gray-100">
+      <ul role="list" className="divide-y divide-gray-100 dark:divide-gray-500">
         {Array.isArray(searchResults) && searchResults.map((result) => (
           <li key={result.id} className="flex justify-between gap-x-6 py-5">
             <div className="flex min-w-0 gap-x-4">
               {/* <img className="h-12 w-12 flex-none rounded-full bg-gray-50" src={person.imageUrl} alt="" /> */}
               <div className="min-w-0 flex-auto">
-                <p className="text-sm font-semibold leading-6 text-gray-900">{result.client.name}_{result.name}</p>
+                <p className="text-sm font-semibold leading-6 text-gray-900 dark:text-slate-200">{result.client.name}_{result.name}</p>
                 <p className="mt-1 truncate text-xs leading-5 text-gray-500">Client:{result.client.name}/Director:{result.director.name}/Model:{result.model}</p>
 
               </div>
             </div>
             <div className="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
-              <p className="text-sm leading-6 text-gray-900">
+              <p className="text-sm leading-6 text-gray-900 dark:text-slate-200">
                 <Link href={`/database/system/edit/${result.id}`}>
                   編集
                 </Link>

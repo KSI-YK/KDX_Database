@@ -33,7 +33,7 @@ const SearchResultsList: React.FC<SearchResultsListProps> = ({ searchResults }) 
       </div>
 
       {/* クライアントリスト */}
-      <ul role="list" className="divide-y divide-gray-100">
+      <ul role="list" className="divide-y divide-gray-100 dark:divide-gray-500">
         {Array.isArray(searchResults) && searchResults.map((result) => (
           <li key={result.id} className="flex justify-between gap-x-6 py-5">
             <div className="flex min-w-0 gap-x-4">

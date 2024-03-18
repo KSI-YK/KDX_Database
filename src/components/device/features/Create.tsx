@@ -118,7 +118,7 @@ const CreatePage: React.FC<CreatePageProps> = ({ clients, user }) => {
 
                         <div className="col-span-3">
                             <Select
-                                className="basic-single text-gray-900 dark:text-slate-200 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                className="basic-single rounded-md text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                 classNamePrefix="select"
                                 isSearchable={true}
                                 name="client"
@@ -136,7 +136,7 @@ const CreatePage: React.FC<CreatePageProps> = ({ clients, user }) => {
 
                         <div className="col-span-3">
                             <Select
-                                className="basic-single text-gray-900 dark:text-slate-200 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                className="basic-single rounded-md text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                 classNamePrefix="select"
                                 isSearchable={true}
                                 name="client"
@@ -157,26 +157,8 @@ const CreatePage: React.FC<CreatePageProps> = ({ clients, user }) => {
                                 onChange={(e) => setSystemName(e.target.value)}
                                 name="name"
                                 id="name"
-                                autoComplete="username"
-                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-slate-200 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                placeholder="金森メタル"
-                            />
-                        </div>
-
-                        {/* 責任者選択 */}
-
-                        <div className="col-span-1">
-                            <h1 className="text-base leading-4 text-gray-900 dark:text-slate-200">責任者/Director</h1>
-                        </div>
-
-                        <div className="col-span-3">
-                            <Select
-                                className="basic-single text-gray-900 dark:text-slate-200 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                classNamePrefix="select"
-                                isSearchable={true}
-                                name="director"
-                                options={userOptions}
-                                onChange={setSelectedDirector}
+                                className="block w-full rounded-md border-0 py-1.5 dark:bg-slate-800 text-gray-900 dark:text-slate-200 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                placeholder="KDM4型造型期"
                             />
                         </div>
 
@@ -192,11 +174,29 @@ const CreatePage: React.FC<CreatePageProps> = ({ clients, user }) => {
                                 onChange={(e) => setSystemModel(e.target.value)}
                                 name="name"
                                 id="name"
-                                autoComplete="username"
-                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-slate-200 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                placeholder="金森メタル"
+                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:bg-slate-800 dark:text-slate-200 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                placeholder="KDM-4"
                             />
                         </div>
+
+                        {/* 責任者選択 */}
+
+                        <div className="col-span-1">
+                            <h1 className="text-base leading-4 text-gray-900 dark:text-slate-200">責任者/Director</h1>
+                        </div>
+
+                        <div className="col-span-3">
+                            <Select
+                                className="basic-single rounded-md text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                classNamePrefix="select"
+                                isSearchable={true}
+                                name="director"
+                                options={userOptions}
+                                onChange={setSelectedDirector}
+                            />
+                        </div>
+
+                        
                     </div>
 
                     <div className="flex flex-row-reverse my-4">

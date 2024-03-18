@@ -22,14 +22,13 @@ const Page = async () => {
 
   return (
     <Container className="pb-16 pt-20 lg:pt-6">
-      <ul role="list" className="divide-y divide-gray-100">
+      <ul role="list" className="divide-y divide-gray-100 dark:divide-gray-500">
         {users.map((user) => (
           <li key={user.id} className="flex justify-between gap-x-6 py-5">
             <div className="flex min-w-0 gap-x-4">
               <div className="min-w-0 flex-auto">
-                <p className="text-sm font-semibold leading-6 text-gray-900">{user.name}</p>
+                <p className="text-sm font-semibold leading-6 text-gray-900 dark:text-slate-200">{user.department.name}/{user.name}</p>
                 <p className="mt-1 truncate text-xs leading-5 text-gray-500">{user.email}</p>
-                <p>{user.department.name}</p>
               </div>
             </div>
             <form>
