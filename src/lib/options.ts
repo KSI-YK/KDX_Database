@@ -7,7 +7,7 @@ import type { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 
 // データベースのマイグレーションを取得（Userテーブルの情報取得用）
-import prismadb from '@/app/lib/prisma'
+import prismadb from '@/lib/prisma'
 
 export const options: NextAuthOptions = {
     // 認証の設定

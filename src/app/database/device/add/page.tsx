@@ -1,7 +1,7 @@
 import Header from '@/components/layouts/Header';
 import { Footer } from '@/components/layouts/Footer';
 import * as Device from '@/components/device/index';
-import prisma from '@/app/lib/prisma';
+import prisma from '@/lib/prisma';
 
 
 export default async function ClientPage() {

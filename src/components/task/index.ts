@@ -1,3 +1,3 @@
-import List from "./features/List";
+import { DataTableDemo } from "./features/List";
 
-export {List};
+export {DataTableDemo};

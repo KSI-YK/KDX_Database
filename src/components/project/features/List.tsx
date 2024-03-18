@@ -16,6 +16,8 @@ import {
   PhoneIcon,
 } from '@heroicons/react/20/solid'
 import { useRouter } from 'next/navigation'
+import * as Task from '@/components/task/index'
+
 
 // System モデルに関連付けられた Client モデルのデータを含む
 type ProjectWith = Projects & {
@@ -98,6 +100,7 @@ const SearchResultsList: React.FC<SearchResultsListProps> = ({
       <div className="grid grid-cols-1 gap-6">
         {Array.isArray(searchProjects) &&
           searchProjects.map((project) => (
+            <>
             <a className='group block bg-white hover:bg-gray-50 dark:hover:bg-slate-950 dark:bg-slate-900 shadow-lg'>
               <div
                 key={project.id}
@@ -187,6 +190,8 @@ const SearchResultsList: React.FC<SearchResultsListProps> = ({
                 </div>
               </div>
             </a>
+            <Task.DataTableDemo />
+            </>
           ))}
       </div>
     </Container>

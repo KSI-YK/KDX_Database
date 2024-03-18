@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt'
 import { NextResponse } from 'next/server'
-import prismadb from '@/app/lib/prisma'
+import prismadb from '@/lib/prisma'
 
 // ユーザー新規登録API
 export const POST = async (req: Request, res: NextResponse) => {

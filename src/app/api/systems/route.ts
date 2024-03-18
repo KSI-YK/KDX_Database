@@ -1,4 +1,4 @@
-import prisma from '@/app/lib/prisma';
+import prisma from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 
 // クライアントの型を定義（データベースのスキーマに応じて変更）

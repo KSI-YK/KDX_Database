@@ -1,6 +1,6 @@
 // /Users/hayatoshimada/Desktop/salient-ts/src/app/api/projects/[projectId]/route.ts
 
-import prisma from '@/app/lib/prisma'
+import prisma from '@/lib/prisma'
 import { NextResponse } from 'next/server'
 import { main } from '../../route'
 

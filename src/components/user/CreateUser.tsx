@@ -1,13 +1,11 @@
 import bcrypt from 'bcrypt';
 import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid';
 import { NextResponse } from 'next/server';
-import prisma from '@/app/lib/prisma';
+import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { Container } from '@/components/Container'
-
-
 import { getServerSession } from 'next-auth';
-import { options } from '@/app/lib/options';
+import { options } from '@/lib/options';
 
 
 const Page = async () => {

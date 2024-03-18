@@ -11,16 +11,47 @@ import {
   User,
 } from '@prisma/client'
 import { Container } from '@/components/Container'
-import { Button } from '@/components/Button'
-import { Menu, Transition } from '@headlessui/react'
 import {
+  CaretSortIcon,
   ChevronDownIcon,
-  EnvelopeIcon,
-  PhoneIcon,
-} from '@heroicons/react/20/solid'
+  DotsHorizontalIcon,
+} from '@radix-ui/react-icons'
+import {
+  ColumnDef,
+  ColumnFiltersState,
+  SortingState,
+  VisibilityState,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from '@tanstack/react-table'
+
+import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Input } from '@/components/ui/input'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 
 // System モデルに関連付けられた Client モデルのデータを含む
-type ProjectWith = Tasks & {
+type TaskWith = Tasks & {
   project: Projects & {
     device: Devices & {
       system: Systems & {
@@ -36,171 +67,277 @@ type ProjectWith = Tasks & {
   status: Status
 }
 
-interface SearchResultsListProps {
-  searchTasks: ProjectWith[]
+const data: Payment[] = [
+  {
+    id: 'm5gr84i9',
+    amount: 316,
+    status: 'success',
+    email: 'ken99@yahoo.com',
+  },
+  {
+    id: '3u1reuv4',
+    amount: 242,
+    status: 'success',
+    email: 'Abe45@gmail.com',
+  },
+  {
+    id: 'derv1ws0',
+    amount: 837,
+    status: 'processing',
+    email: 'Monserrat44@gmail.com',
+  },
+  {
+    id: '5kma53ae',
+    amount: 874,
+    status: 'success',
+    email: 'Silas22@gmail.com',
+  },
+  {
+    id: 'bhqecj4p',
+    amount: 721,
+    status: 'failed',
+    email: 'carmella@hotmail.com',
+  },
+]
+
+export type Payment = {
+  id: string
+  amount: number
+  status: 'pending' | 'processing' | 'success' | 'failed'
+  email: string
 }
 
-function classNames(...classes: any) {
-  return classes.filter(Boolean).join(' ')
-}
-
-const SearchResultsList: React.FC<SearchResultsListProps> = ({
-  searchTasks,
-}) => {
-  const [status, setStatus] = useState<ProjectWith[]>([])
-
-  const updateProjectStatus = async (projectId: string, statusId: string) => {
-    try {
-      const response = await fetch(
-        `http://localhost:3000/api/projects/${projectId}/status`,
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ statusId }),
-        },
+export const columns: ColumnDef<Payment>[] = [
+  {
+    id: 'select',
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && 'indeterminate')
+        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
+    accessorKey: 'status',
+    header: 'Status',
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue('status')}</div>
+    ),
+  },
+  {
+    accessorKey: 'email',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          Email
+          <CaretSortIcon className="ml-2 h-4 w-4" />
+        </Button>
       )
-      if (response.ok) {
-        // ステータスの更新に成功した場合、状態を更新します
-        const updatedProject = await response.json()
-        // 状態を更新するロジックをここに実装します
-        // 例えば、searchResultsを更新するなど
-      } else {
-        // エラーハンドリング
-        console.error('Status update failed')
-      }
-    } catch (error) {
-      console.error('Error updating project status:', error)
-    }
-  }
+    },
+    cell: ({ row }) => <div className="lowercase">{row.getValue('email')}</div>,
+  },
+  {
+    accessorKey: 'amount',
+    header: () => <div className="text-right">Amount</div>,
+    cell: ({ row }) => {
+      const amount = parseFloat(row.getValue('amount'))
 
-  // useEffectフックを使用して、コンポーネントがマウントされた時に実行される処理を定義します
-  useEffect(() => {
-    const fetchSystems = async () => {
-      try {
-        const response = await fetch('http://localhost:3000/api/status')
-        const data = await response.json()
-        // 取得したデータでsystemsステートを更新します
-        setStatus(data.status)
-      } catch (error) {
-        console.error('システムの取得に失敗しました:', error)
-      }
-    }
+      // Format the amount as a dollar amount
+      const formatted = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+      }).format(amount)
 
-    fetchSystems()
-  }, []) // 依存配列を空にすることで、コンポーネントがマウントされた時にのみ実行されます
+      return <div className="text-right font-medium">{formatted}</div>
+    },
+  },
+  {
+    id: 'actions',
+    enableHiding: false,
+    cell: ({ row }) => {
+      const payment = row.original
+
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <span className="sr-only">Open menu</span>
+              <DotsHorizontalIcon className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuItem
+              onClick={() => navigator.clipboard.writeText(payment.id)}
+            >
+              Copy payment ID
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>View customer</DropdownMenuItem>
+            <DropdownMenuItem>View payment details</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )
+    },
+  },
+]
+
+export function DataTableDemo() {
+  const [sorting, setSorting] = React.useState<SortingState>([])
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    [],
+  )
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({})
+  const [rowSelection, setRowSelection] = React.useState({})
+
+  const table = useReactTable({
+    data,
+    columns,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
+      rowSelection,
+    },
+  })
+
   return (
-    <Container className="pb-2 pt-20 lg:pt-6">
-      {/* 新規追加ボタン */}
-      <div className="my-4 flex flex-row-reverse">
-        <div>
-          <Button href="/database/device/add" className="sticky top-1">
-            新規追加
+    <div className="w-full">
+      <div className="flex items-center py-4">
+        <Input
+          placeholder="Filter emails..."
+          value={(table.getColumn('email')?.getFilterValue() as string) ?? ''}
+          onChange={(event) =>
+            table.getColumn('email')?.setFilterValue(event.target.value)
+          }
+          className="max-w-sm"
+        />
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="ml-auto">
+              Columns <ChevronDownIcon className="ml-2 h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {table
+              .getAllColumns()
+              .filter((column) => column.getCanHide())
+              .map((column) => {
+                return (
+                  <DropdownMenuCheckboxItem
+                    key={column.id}
+                    className="capitalize"
+                    checked={column.getIsVisible()}
+                    onCheckedChange={(value) =>
+                      column.toggleVisibility(!!value)
+                    }
+                  >
+                    {column.id}
+                  </DropdownMenuCheckboxItem>
+                )
+              })}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
+                    </TableHead>
+                  )
+                })}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && 'selected'}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  No results.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+      <div className="flex items-center justify-end space-x-2 py-4">
+        <div className="text-muted-foreground flex-1 text-sm">
+          {table.getFilteredSelectedRowModel().rows.length} of{' '}
+          {table.getFilteredRowModel().rows.length} row(s) selected.
+        </div>
+        <div className="space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            Previous
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            Next
           </Button>
         </div>
       </div>
-
-      {Array.isArray(searchTasks) &&
-        searchTasks.map((task) => (
-          <div className="border-b border-gray-200 bg-white px-4 py-5 dark:border-gray-500 dark:bg-slate-900 sm:px-6">
-            <div className="flex min-w-0 flex-auto items-center justify-between py-2">
-              <div>
-                <p className="text-sm leading-6 text-gray-900 dark:text-slate-200">
-                  {task.name}
-                </p>
-              </div>
-
-              <div className="">
-                {/* 完了済みセレクタ */}
-                <Menu as="div" className="relative inline-block text-left">
-                  <div>
-                    <Menu.Button className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-slate-800 dark:text-slate-200">
-                      {task.status.name}
-                      <ChevronDownIcon
-                        className="-mr-1 h-5 w-5 text-gray-400"
-                        aria-hidden="true"
-                      />
-                    </Menu.Button>
-                  </div>
-
-                  <Menu.Items
-                    className="absolute z-10 mt-2 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-slate-800"
-                  >
-                    <div className="py-1">
-                      {status.map((feature) => (
-                        <Menu.Item>
-                          {({ active }) => (
-                            <button
-                              type="submit"
-                              key={feature.id}
-                              className={classNames(
-                                active
-                                  ? 'bg-gray-100 text-gray-900 dark:bg-slate-700 dark:text-slate-100'
-                                  : 'text-gray-700 dark:text-slate-200',
-                                'block w-full px-4 py-2 text-left text-sm',
-                              )}
-                              onClick={() =>
-                                updateProjectStatus(task.id, feature.id)
-                              } // ここでプロジェクトIDとステータスIDを渡します
-                            >
-                              {feature.name}
-                            </button>
-                          )}
-                        </Menu.Item>
-                      ))}
-                    </div>
-                  </Menu.Items>
-                </Menu>
-              </div>
-            </div>
-            <div className="-ml-4 -mt-4 flex items-center justify-between">
-              <div className="ml-4 mt-4">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <img
-                      className="h-12 w-12 rounded-full"
-                      src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                      alt=""
-                    />
-                  </div>
-                  <div className="ml-4">
-                    <h3 className="text-sm font-semibold leading-6 text-gray-900 dark:text-slate-200">
-                      Director:{task.director.name}
-                    </h3>
-                    <p className="text-xs text-gray-500">
-                      {task.director.email}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="ml-4 mt-4 flex flex-shrink-0">
-                <button
-                  type="button"
-                  className="relative inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                >
-                  <PhoneIcon
-                    className="-ml-0.5 mr-1.5 h-5 w-5 text-gray-400"
-                    aria-hidden="true"
-                  />
-                  <span>Phone</span>
-                </button>
-                <button
-                  type="button"
-                  className="relative ml-3 inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                >
-                  <EnvelopeIcon
-                    className="-ml-0.5 mr-1.5 h-5 w-5 text-gray-400"
-                    aria-hidden="true"
-                  />
-                  <span>Email</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
-    </Container>
+    </div>
   )
 }
-
-export default SearchResultsList
