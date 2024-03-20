@@ -6,7 +6,7 @@ const ClientPage = () => {
   return (
     <>
       <Header />
-      <main>
+      <main className='pt-14'>
         <Client.Create />
       </main>
       <Footer />

@@ -11,42 +11,26 @@ export async function main() {
 
 export const GET = async (req: Request, res: NextResponse) => {
   try {
-    const searchNameEncoded = req.url.split("/projects/search/")[1];
+    const searchNameEncoded = req.url.split("/systems/search/")[1];
     const searchName = decodeURIComponent(searchNameEncoded);
     const splitName = searchName.split("&");
     const clientName = splitName[0]
     const directorName = splitName[1]
     const systemName = splitName[2]
-    const deviceName = splitName[3]
-
     await main();
     // 検索条件のオブジェクトを動的に構築
     let whereClause: any = {};
 
-    if (deviceName) {
-      whereClause.name = {
-        contains: deviceName,
-      };
-    }
-
     if (systemName) {
-      whereClause.device = {
-        system: {
-          name: {
-            contains: systemName,
-          },
-        },
+      whereClause.name = {
+        contains: systemName,
       };
     }
 
     if (clientName) {
-      whereClause.device = {
-        system: {
-          client: {
-            name: {
-              contains: clientName,
-            },
-          },
+      whereClause.client = {
+        name: {
+          contains: clientName,
         },
       };
     }
@@ -59,33 +43,37 @@ export const GET = async (req: Request, res: NextResponse) => {
       };
     }
 
-    const projects = await prisma.projects.findMany({
+    const systems = await prisma.systems.findMany({
       include: {
         director: true,
-        status: true,
-        type: true,
-        device: {
-          include: {
-            system: {
-              include: {
-                client: true,
-              },
-            },
-          },
-        },
+        client: true,
       },
-      orderBy: [{
-        updatedAt: 'desc',
-        // updatedAt: 'asc',
+      orderBy: {
+        updatedAt: 'desc'
       },
-    ],
       where: whereClause,
     });
-    console.log(projects)
-    return NextResponse.json({ message: "Success", projects }, { status: 200 });
+    return NextResponse.json({ message: "Success", systems }, { status: 200 });
   } catch (err) {
     return NextResponse.json({ message: "Error" }, { status: 500 });
   } finally {
     await prisma.$disconnect();
   }
 };
+
+export const POST = async (req: Request, res: NextResponse) => {
+  try {
+    const {name, model, total_cnt, clientId, directorId} = await req.json();
+
+    await main();
+    const systems = await prisma.systems.create({data: {name, model, total_cnt, clientId, directorId}});
+    return NextResponse.json({message: "Success", systems}, {status: 201});
+
+  } catch (err) {
+    return NextResponse.json({message: "Error"}, {status: 500});
+
+  } finally {
+    await prisma.$disconnect();
+  }
+};
+

@@ -12,7 +12,7 @@ export default async function ClientPage({ params }: { params: { id: string } })
     return (
         <>
             <Header />
-            <main>
+            <main className='pt-14'>
                 <System.Edit 
                     id={systemID}
                     clients={clients}

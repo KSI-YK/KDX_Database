@@ -15,7 +15,7 @@ import {
   User,
 } from '@prisma/client'
 import * as Project from '@/components/project/index'
-import { Button } from '@/components/Button'
+import { MagnifyingGlassIcon, PlusIcon } from '@radix-ui/react-icons'
 
 // System モデルに関連付けられた Client モデルのデータを含む
 type ProjectWith = Projects & {
@@ -71,10 +71,33 @@ const SearchComponent: React.FC = () => {
   return (
     <>
       <Header />
-      <main>
-        <Container className="pb-2 pt-20 lg:pt-6">
-          <Button onClick={() => setOpen(true)}>検索</Button>
+      <main className="pt-14">
+        <Container>
+          <div className="sm:flex sm:items-center">
+            <div className="sm:flex-auto">
+              <div className="border-b border-gray-900/10 pb-4 pt-4 dark:border-slate-500">
+                <h1 className="text-base font-semibold leading-6  dark:text-slate-200">
+                  プロジェクト一覧
+                </h1>
+              </div>
+            </div>
+          </div>
         </Container>
+
+        {/* 検索アイコン */}
+        <div className="fixed right-10 top-20 cursor-pointer">
+          <MagnifyingGlassIcon
+            onClick={() => setOpen(true)}
+            className="inline-block h-12 w-12 rounded-full bg-slate-100 p-2 shadow-md hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-950"
+          />
+        </div>
+        {/* 新規追加アイコン */}
+        <div className="fixed right-10 top-36 cursor-pointer">
+          <PlusIcon
+            onClick={() => setOpen(true)}
+            className="inline-block h-12 w-12 rounded-full bg-slate-100 p-2 shadow-md hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-950"
+          />
+        </div>
 
         {/* サイドバー */}
         <Transition.Root show={open} as={Fragment}>
@@ -94,7 +117,7 @@ const SearchComponent: React.FC = () => {
                   >
                     <Dialog.Panel className="pointer-events-auto w-screen max-w-md">
                       <div className="flex h-full flex-col overflow-y-scroll bg-white py-6 shadow-xl dark:bg-slate-700">
-                        <div className="px-4 sm:px-6">
+                        <div className="px-4 pt-16 sm:px-6">
                           <div className="flex items-start justify-between">
                             <Dialog.Title className="text-base font-semibold leading-6 text-gray-900 dark:text-slate-200">
                               検索
@@ -111,7 +134,6 @@ const SearchComponent: React.FC = () => {
                                   className="h-6 w-6"
                                   aria-hidden="true"
                                 />
-
                               </button>
                             </div>
                           </div>
@@ -187,6 +209,7 @@ const SearchComponent: React.FC = () => {
                           </div>
                         </div>
                       </div>
+                      
                     </Dialog.Panel>
                   </Transition.Child>
                 </div>

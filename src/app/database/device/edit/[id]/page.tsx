@@ -28,7 +28,7 @@ export default async function ClientPage({ params }: { params: { id: string } },
     return (
         <>
             <Header />
-            <main>
+            <main className='pt-14'>
                 <Device.Edit 
                     id={deviceID}
                     clientName={clientName}

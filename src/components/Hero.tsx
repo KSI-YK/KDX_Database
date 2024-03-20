@@ -1,18 +1,16 @@
 
 "use client";
 
-import Image from 'next/image'
 import {signIn, signOut} from "next-auth/react";
 import { Button } from '@/components/Button'
 import { Container } from '@/components/Container'
-import { Zen_Tokyo_Zoo } from 'next/font/google'
 
 
 export function Hero() {
   return (
     <Container className="pb-16 pt-20 text-center lg:pt-32">
       <h1 className="mx-auto max-w-4xl font-display text-5xl font-medium tracking-tight text-green-400 sm:text-7xl">
-        Innovate{' '}with
+        Innovate{' '}with<br />
         <span className="relative whitespace-nowrap text-green-600">
           <svg
             aria-hidden="true"

@@ -160,10 +160,10 @@ function ClientHome() {
   }, [user?.departmentId]) // 依存配列内でuser.departmentIdを監視
 
   return (
-    <header className="bg-slate-100 dark:bg-slate-950 shadow-lg">
+    <header className="fixed w-full top-0 z-50 bg-slate-100 dark:bg-slate-950 shadow-lg">
       <Container>
         <nav
-          className="mx-auto flex items-center justify-between px-0 py-6"
+          className="mx-auto flex items-center justify-between px-0 py-2"
           aria-label="Global"
         >
           <div className="flex lg:flex-1">

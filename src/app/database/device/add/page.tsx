@@ -11,7 +11,7 @@ export default async function ClientPage() {
   return (
     <>
       <Header />
-      <main>
+      <main className='pt-14'>
           <Device.Create 
             clients={clients}
             user={user}

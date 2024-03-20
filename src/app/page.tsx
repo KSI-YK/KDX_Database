@@ -18,7 +18,7 @@ const Home: React.FC<HomeProps> = ({ users }) => {
   return (
     <>
       <Header />
-      <main>
+      <main className='pt-14'>
         <Hero />
       </main>
       <Footer />

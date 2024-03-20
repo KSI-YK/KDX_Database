@@ -9,7 +9,7 @@ const ClientPage = ({ params }: { params: { id: string } }) => {
     return (
         <>
             <Header />
-            <main>
+            <main className='pt-14'>
                 <Client.Edit params={{ id: clientID }} />
             </main>
             <Footer />

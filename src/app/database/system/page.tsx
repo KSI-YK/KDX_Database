@@ -58,7 +58,7 @@ const SearchComponent: React.FC = () => {
   return (
     <>
       <Header />
-      <main>
+      <main className='pt-14'>
         <Container className="pb-2 pt-20 lg:pt-6">
           <div className="space-y-4">
             <div className="sm:flex sm:items-center">
