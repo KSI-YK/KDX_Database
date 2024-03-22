@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { Status, Tasks, User } from '@prisma/client'
 import {
   CaretSortIcon,
   ChevronDownIcon,
@@ -19,9 +18,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-
 import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -40,22 +37,17 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { useRouter } from 'next/navigation'
-import { Link } from 'lucide-react'
+import { TaskEditor } from './TaskEditor'
+import { TaskWith } from '@/types'
+import { fetchTaskWithProject, updateTaskStatus } from './ApiReqProject'
 
 interface CreatePageProps {
   projectId: string
 }
 
-export type TaskWith = Tasks & {
-  director: User
-} & {
-  creator: User
-} & {
-  status: Status
-}
-
-export const DataTableDemo: React.FC<CreatePageProps> = ({ projectId }) => {
+// Main
+export const TaskList: React.FC<CreatePageProps> = ({ projectId }) => {
+  const [isOpen, setIsOpen] = useState(false) // ダイアログの開閉状態
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
@@ -63,52 +55,11 @@ export const DataTableDemo: React.FC<CreatePageProps> = ({ projectId }) => {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
-  const [data, setData] = React.useState<TaskWith[]>([])
-
-  // データを取得する関数
-  const fetchData = async () => {
-    try {
-      const response = await fetch(
-        `http://localhost:3000/api/tasks/projectwith/${projectId}`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
-      )
-      if (response.ok) {
-        const fetchedData = await response.json()
-        setData(fetchedData.tasks)
-      } else {
-        console.error('Failed to fetch tasks')
-      }
-    } catch (error) {
-      console.error('Error fetching tasks:', error)
-    }
-  }
-
-  // ステータスを更新する関数
-  const updateTaskStatus = async (taskId: string, statusId: string) => {
-    try {
-      const response = await fetch(
-        `http://localhost:3000/api/tasks/statusupdate/${taskId}/${statusId}`,
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
-      )
-      if (response.ok) {
-        // ステータス更新が成功したらデータを再取得
-        await fetchData()
-      } else {
-        console.error('Failed to update status')
-      }
-    } catch (error) {
-      console.error('Error updating status:', error)
-    }
+  const [data, setTask] = React.useState<TaskWith[]>([])
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null)
+  const handleEditButtonClick = (taskId: string) => {
+    setEditingTaskId(taskId)
+    setIsOpen(true)
   }
 
   // 初回読み出し時に、Inputに値を入力する
@@ -126,7 +77,7 @@ export const DataTableDemo: React.FC<CreatePageProps> = ({ projectId }) => {
         )
         if (response.ok) {
           const fetchData = await response.json()
-          setData(fetchData.tasks)
+          setTask(fetchData.tasks)
           // router.refresh()
         } else {
           // エラーハンドリング
@@ -139,7 +90,7 @@ export const DataTableDemo: React.FC<CreatePageProps> = ({ projectId }) => {
     fetchData()
   }, [])
 
-  // カラムの定義
+  // -------カラムの定義
   const columns: ColumnDef<TaskWith>[] = [
     // タスク名列
     {
@@ -148,6 +99,7 @@ export const DataTableDemo: React.FC<CreatePageProps> = ({ projectId }) => {
       header: 'Name',
       cell: ({ row }) => row.getValue('name'),
     },
+
     // ディレクター名列
     {
       id: 'director',
@@ -155,6 +107,24 @@ export const DataTableDemo: React.FC<CreatePageProps> = ({ projectId }) => {
       accessorFn: (row) => row.director.name,
       cell: ({ getValue }) => getValue(), // ここでgetValue()を直接呼び出す
     },
+
+    // マネージャー列（複数のマネージャー名をスラッシュで区切って表示）
+    {
+      id: 'managers',
+      header: 'Managers',
+      accessorFn: (row) => {
+        // マネージャーの名前をスラッシュで結合
+        const managerNames = row.managers
+          .map((manager) => manager.name)
+          .join(' / ')
+        // 20文字を超える場合は省略
+        return managerNames.length > 20
+          ? `${managerNames.substring(0, 20)}...`
+          : managerNames
+      },
+      cell: ({ getValue }) => getValue(), // ここでgetValue()を直接呼び出す
+    },
+
     // ステータス列
     {
       id: 'status',
@@ -162,7 +132,7 @@ export const DataTableDemo: React.FC<CreatePageProps> = ({ projectId }) => {
         return (
           <Button
             variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           >
             Status
             <CaretSortIcon className="ml-2 h-4 w-4" />
@@ -172,8 +142,59 @@ export const DataTableDemo: React.FC<CreatePageProps> = ({ projectId }) => {
       accessorFn: (row) => row.status.name,
       cell: ({ getValue }) => getValue(), // ここでgetValue()を直接呼び出す
     },
-    
-    
+
+    // 開始日
+    {
+      id: 'startDate',
+      accessorKey: 'startDate',
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          >
+            Start
+            <CaretSortIcon className="ml-2 h-4 w-4" />
+          </Button>
+        )
+      },
+      cell: ({ row }) => {
+        const date = new Date(row.getValue('startDate'))
+        const formattedDate = new Intl.DateTimeFormat('ja-JP', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        }).format(date)
+        return <span>{formattedDate}</span>
+      },
+    },
+
+    // 終了日
+    {
+      id: 'endDate',
+      accessorKey: 'endDate',
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          >
+            End
+            <CaretSortIcon className="ml-2 h-4 w-4" />
+          </Button>
+        )
+      },
+      cell: ({ row }) => {
+        const date = new Date(row.getValue('endDate'))
+        const formattedDate = new Intl.DateTimeFormat('ja-JP', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        }).format(date)
+        return <span>{formattedDate}</span>
+      },
+    },
+
     // 更新日
     {
       id: 'updatedAt',
@@ -182,7 +203,7 @@ export const DataTableDemo: React.FC<CreatePageProps> = ({ projectId }) => {
         return (
           <Button
             variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           >
             Update
             <CaretSortIcon className="ml-2 h-4 w-4" />
@@ -190,13 +211,34 @@ export const DataTableDemo: React.FC<CreatePageProps> = ({ projectId }) => {
         )
       },
       cell: ({ row }) => {
-        const date = new Date(row.getValue('updatedAt'));
+        const date = new Date(row.getValue('updatedAt'))
         const formattedDate = new Intl.DateTimeFormat('ja-JP', {
           year: 'numeric',
           month: 'long',
           day: 'numeric',
-        }).format(date);
-        return <span>{formattedDate}</span>;
+        }).format(date)
+        return <span>{formattedDate}</span>
+      },
+    },
+    {
+      id: 'edit',
+      enableHiding: false,
+      cell: ({ row }) => {
+        const task = row.original
+        return (
+          <>
+            <button onClick={() => handleEditButtonClick(task.id)}>Edit</button>
+            {isOpen && editingTaskId === task.id && (
+              <TaskEditor
+                isOpen={isOpen}
+                setIsOpen={setIsOpen}
+                task={task}
+                projectId={projectId}
+                setTask={setTask}
+              />
+            )}
+          </>
+        )
       },
     },
     // アクションメニュー
@@ -218,12 +260,14 @@ export const DataTableDemo: React.FC<CreatePageProps> = ({ projectId }) => {
               {/* ドロップダウンの見出し */}
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
+              {/* 水平線 */}
               <DropdownMenuSeparator />
 
               {/* ステータス更新ボタン */}
+              {/* ステータスのIDをハードコーディングしているが。。。 */}
               <DropdownMenuItem
                 onClick={() =>
-                  updateTaskStatus(task.id, 'cltwhuh7e00056gcdobbzou8h')
+                  updateTaskStatus(task.id, 'cltwhuh7e00056gcdobbzou8h', projectId, setTask)
                 }
               >
                 完了にする
@@ -231,7 +275,7 @@ export const DataTableDemo: React.FC<CreatePageProps> = ({ projectId }) => {
 
               <DropdownMenuItem
                 onClick={() =>
-                  updateTaskStatus(task.id, 'cltwhurp900076gcdgcamm5wl')
+                  updateTaskStatus(task.id, 'cltwhurp900076gcdgcamm5wl', projectId, setTask)
                 }
               >
                 停止中にする
@@ -239,14 +283,11 @@ export const DataTableDemo: React.FC<CreatePageProps> = ({ projectId }) => {
 
               <DropdownMenuItem
                 onClick={() =>
-                  updateTaskStatus(task.id, 'cltwhuly800066gcdfghzoo9a')
+                  updateTaskStatus(task.id, 'cltwhuly800066gcdfghzoo9a', projectId, setTask)
                 }
               >
                 進行中にする
               </DropdownMenuItem>
-
-              {/* ページ遷移ボタン */}
-              <DropdownMenuItem>編集</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         )
@@ -284,12 +325,10 @@ export const DataTableDemo: React.FC<CreatePageProps> = ({ projectId }) => {
           }
           className="max-w-xs"
         />
-        <a href={`/project/taskadd/${projectId}`} className='ml-auto'>
-          <Button >
-            Create Task
-          </Button>
+        <a href={`/project/taskadd/${projectId}`} className="ml-auto">
+          <Button>Create Task</Button>
         </a>
-        
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-4">

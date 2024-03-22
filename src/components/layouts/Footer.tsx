@@ -8,14 +8,7 @@ export function Footer() {
   return (
     <footer className="bg-slate-100 dark:bg-slate-950 mt-auto">
       <Container>
-        {/* <div className="py-0">
-          <nav className="mt-4 text-sm" aria-label="quick links">
-            <div className="-my-1 flex justify-center gap-x-6">
-              <NavLink href="/">Home</NavLink>
-            </div>
-          </nav>
-        </div> */}
-        <div className="flex flex-col items-center py-10 sm:flex-row-reverse sm:justify-between " >
+        <div className="flex flex-col items-center py-2 sm:flex-row-reverse sm:justify-between " >
           <div className="flex gap-x-6 items-center">
             <div>
               <ThemeSwitch />

@@ -1,32 +1,41 @@
-import prisma from '@/lib/prisma';
-import { NextResponse } from 'next/server';
+import prisma from '@/lib/prisma'
+import { NextResponse } from 'next/server'
 
 export async function main() {
   try {
-    await prisma.$connect();
+    await prisma.$connect()
   } catch (err) {
-    return Error("DB接続に失敗しました");
+    return Error('DB接続に失敗しました')
   }
 }
 
 export const GET = async (req: Request, res: NextResponse) => {
   try {
-    const searchNameEncoded = req.url.split("/projects/search/")[1];
-    const searchName = decodeURIComponent(searchNameEncoded);
-    const splitName = searchName.split("&");
+    const searchNameEncoded = req.url.split('/projects/search/')[1]
+    const searchName = decodeURIComponent(searchNameEncoded)
+    const splitName = searchName.split('&')
     const clientName = splitName[0]
     const directorName = splitName[1]
     const systemName = splitName[2]
     const deviceName = splitName[3]
+    const projectName = splitName[4]
 
-    await main();
+    await main()
     // 検索条件のオブジェクトを動的に構築
-    let whereClause: any = {};
+    let whereClause: any = {}
+
+    if (projectName) {
+      whereClause.name = {
+        contains: projectName,
+      }
+    }
 
     if (deviceName) {
-      whereClause.name = {
-        contains: deviceName,
-      };
+      whereClause.device = {
+        name: {
+          contains: deviceName,
+        },
+      }
     }
 
     if (systemName) {
@@ -36,7 +45,7 @@ export const GET = async (req: Request, res: NextResponse) => {
             contains: systemName,
           },
         },
-      };
+      }
     }
 
     if (clientName) {
@@ -48,7 +57,7 @@ export const GET = async (req: Request, res: NextResponse) => {
             },
           },
         },
-      };
+      }
     }
 
     if (directorName) {
@@ -56,12 +65,16 @@ export const GET = async (req: Request, res: NextResponse) => {
         name: {
           contains: directorName,
         },
-      };
+      }
     }
 
     const projects = await prisma.projects.findMany({
       include: {
-        director: true,
+        director: {
+          include: {
+            department: true,
+          },
+        },
         status: true,
         type: true,
         device: {
@@ -74,18 +87,18 @@ export const GET = async (req: Request, res: NextResponse) => {
           },
         },
       },
-      orderBy: [{
-        updatedAt: 'desc',
-        // updatedAt: 'asc',
-      },
-    ],
+      orderBy: [
+        {
+          updatedAt: 'desc',
+          // updatedAt: 'asc',
+        },
+      ],
       where: whereClause,
-    });
-    console.log(projects)
-    return NextResponse.json({ message: "Success", projects }, { status: 200 });
+    })
+    return NextResponse.json({ message: 'Success', projects }, { status: 200 })
   } catch (err) {
-    return NextResponse.json({ message: "Error" }, { status: 500 });
+    return NextResponse.json({ message: 'Error' }, { status: 500 })
   } finally {
-    await prisma.$disconnect();
+    await prisma.$disconnect()
   }
-};
+}

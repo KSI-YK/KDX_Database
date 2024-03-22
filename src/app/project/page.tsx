@@ -7,14 +7,14 @@ import { Dialog, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import {
   Clients,
+  Departments,
   Devices,
   Projects,
   Status,
   Systems,
-  Tasks,
   User,
 } from '@prisma/client'
-import * as Project from '@/components/project/index'
+import ProjectList from './ProjectList'
 import { MagnifyingGlassIcon, PlusIcon } from '@radix-ui/react-icons'
 
 // System モデルに関連付けられた Client モデルのデータを含む
@@ -25,7 +25,9 @@ type ProjectWith = Projects & {
     }
   }
 } & {
-  director: User
+  director: User & {
+    department: Departments
+  }
 } & {
   status: Status
 }
@@ -37,8 +39,10 @@ const SearchComponent: React.FC = () => {
   const directorRef = useRef<HTMLInputElement | null>(null)
   const systemRef = useRef<HTMLInputElement | null>(null)
   const deviceRef = useRef<HTMLInputElement | null>(null)
+  const projectRef = useRef<HTMLInputElement | null>(null)
 
-  // side barの監視
+
+  // side barの監視(虫眼鏡の画像をクリックすると検索バーが表示される)
   const [open, setOpen] = useState(false)
 
   // useEffectフックを使用して、コンポーネントがマウントされた時に実行される処理を定義します
@@ -61,7 +65,7 @@ const SearchComponent: React.FC = () => {
   const handleSearch = async (searchTerm: string) => {
     let url = 'http://localhost:3000/api/projects'
     if (searchTerm.trim() !== '') {
-      url += `/search/${clientRef.current!.value}&${directorRef.current!.value}&${systemRef.current!.value}&${deviceRef.current!.value}`
+      url += `/search/${clientRef.current!.value}&${directorRef.current!.value}&${systemRef.current!.value}&${deviceRef.current!.value}&${projectRef.current!.value}`
     }
     const response = await fetch(url)
     const data = await response.json()
@@ -73,13 +77,18 @@ const SearchComponent: React.FC = () => {
       <Header />
       <main className="pt-14">
         <Container>
+          {/* ページヘッダー */}
           <div className="sm:flex sm:items-center">
-            <div className="sm:flex-auto">
-              <div className="border-b border-gray-900/10 pb-4 pt-4 dark:border-slate-500">
-                <h1 className="text-base font-semibold leading-6  dark:text-slate-200">
-                  プロジェクト一覧
-                </h1>
-              </div>
+            <div className="border-b border-gray-300 dark:border-gray-500 sm:flex-auto">
+              <h1 className="pt-4 text-3xl font-semibold text-gray-900 dark:text-slate-200">
+                All Projects
+              </h1>
+              <p className="pb-2 text-xs text-gray-500">プロジェクト一覧</p>
+              <p className="pb-2 text-sm leading-4 text-gray-900 dark:text-slate-200">
+                {/* Client: {project?.device.system.client.name}　&gt;　System:{' '}
+                {project?.device.system.name}　&gt;　Device:{' '}
+                {project?.device.name}　&gt;　Project: {project?.name} */}
+              </p>
             </div>
           </div>
         </Container>
@@ -205,11 +214,26 @@ const SearchComponent: React.FC = () => {
                                   placeholder="検索..."
                                 />
                               </div>
+
+                              <div className="col-span-1">
+                                <h2 className="text-base text-gray-900 dark:text-slate-200">
+                                  プロジェクト名
+                                </h2>
+                              </div>
+
+                              <div className="col-span-3">
+                                <input
+                                  type="text"
+                                  onChange={(e) => handleSearch(e.target.value)}
+                                  ref={projectRef}
+                                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-slate-800 dark:text-slate-200 sm:text-sm sm:leading-6"
+                                  placeholder="検索..."
+                                />
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
-                      
                     </Dialog.Panel>
                   </Transition.Child>
                 </div>
@@ -219,7 +243,7 @@ const SearchComponent: React.FC = () => {
         </Transition.Root>
 
         {/* リストのコンポーネントを常時更新 */}
-        <Project.List searchProjects={searchResults} />
+        <ProjectList searchProjects={searchResults} />
       </main>
       <Footer />
     </>

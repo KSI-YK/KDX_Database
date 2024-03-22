@@ -14,7 +14,11 @@ export const GET = async (req: Request, res: NextResponse) => {
     await main()
     const projects = await prisma.projects.findMany({
       include: {
-        director: true,
+        director: {
+          include: {
+            department: true,
+          },
+        },
         status: true,
         type: true,
         device: {

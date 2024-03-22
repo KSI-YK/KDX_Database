@@ -237,7 +237,6 @@ const Create: React.FC<CreatePageProps> = ({
                 options={taskOptions}
                 onChange={setType}
               />
-              <Button type='button'>新規追加</Button>
             </div>
 
             {/* 状態入力 */}

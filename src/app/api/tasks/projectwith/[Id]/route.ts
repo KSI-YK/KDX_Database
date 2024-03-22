@@ -19,6 +19,8 @@ export const GET = async (req: Request, res: NextResponse) => {
         director: true,
         creator: true,
         status: true,
+        managers: true,
+        type: true,
       },
       where: {
         projectId: projectId as string,

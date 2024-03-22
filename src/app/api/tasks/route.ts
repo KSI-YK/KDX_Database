@@ -42,10 +42,6 @@ export const POST = async (req: Request, res: NextResponse) => {
       startDate,
       endDate,
     } = await req.json()
-    
-
-    console.log(endDate)
-    console.log(managers)
 
 
     await main()

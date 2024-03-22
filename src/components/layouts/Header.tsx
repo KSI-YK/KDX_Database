@@ -139,7 +139,6 @@ function ClientHome() {
             `http://localhost:3000/api/departments/${user.departmentId}`,
           )
           const data = await response.json()
-          console.log(data)
 
           // APIから期待通りのレスポンスが返されたか確認
           if (data && data.department.name) {

@@ -16,20 +16,20 @@ import {
 
 export function DatePickerWithRange({
   className,
+  defaultDateRange,
   onDateChange,
-}: React.HTMLAttributes<HTMLDivElement> & {
+}: React.HTMLAttributes<HTMLDivElement> & {defaultDateRange?: DateRange} & {
   onDateChange?: (range: DateRange | undefined) => void
 }) {
-  const [date, setDate] = React.useState<DateRange | undefined>({
-    // from: new Date(2022, 0, 20),
-    // to: addDays(new Date(2022, 0, 20), 20),
 
-    // 初期値を空欄で今日の日付
-    from: new Date(),
-    // 初期値の期間は3日間
-    to: addDays(new Date(), 3),
-  })
+  const [date, setDate] = React.useState<DateRange | undefined>(defaultDateRange)
 
+  React.useEffect(() => {
+    if (defaultDateRange) {
+      setDate(defaultDateRange);
+    }
+  }, [defaultDateRange]);
+  
   return (
     <div className={cn('grid gap-2', className)}>
       <Popover>
@@ -46,11 +46,11 @@ export function DatePickerWithRange({
             {date?.from ? (
               date.to ? (
                 <>
-                  {format(date.from, 'yyyy年M月d日')} -{' '}
-                  {format(date.to, 'yyyy年M月d日')}
+                  {format(date.from, 'yyyy/M/d')} -{' '}
+                  {format(date.to, 'yyyy/M/d')}
                 </>
               ) : (
-                format(date.from, 'yyyy年M月d日')
+                format(date.from, 'yyyy/M/d/')
               )
             ) : (
               <span>Pick a date</span>

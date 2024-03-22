@@ -1,3 +1,5 @@
+// pages/api/clients.ts
+
 import prisma from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 
@@ -13,18 +15,12 @@ export async function main() {
 export const GET = async (req: Request, res: NextResponse) => {
   try {
     await main();
-    const systems = await prisma.systems.findMany({
-        include: {
-          director: true,
-          client: true,
-        },
-        orderBy: {
-          updatedAt: 'desc'
-        },
-      });
-    return NextResponse.json({message: "Success", systems}, {status: 200});
+    const user = await prisma.user.findMany();
+    return NextResponse.json({message: "Success", user}, {status: 200});
+
   } catch (err) {
     return NextResponse.json({message: "Error"}, {status: 500});
+
   } finally {
     await prisma.$disconnect();
   }
@@ -32,13 +28,17 @@ export const GET = async (req: Request, res: NextResponse) => {
 
 export const POST = async (req: Request, res: NextResponse) => {
   try {
-    const {name, model, total_cnt, clientId, directorId} = await req.json();
+    const {name, username, email, image, hashedPassword, typeId, postId, departmentId} = await req.json();
+
     await main();
-    const systems = await prisma.systems.create({data: {name, model, total_cnt, clientId, directorId}});
-    return NextResponse.json({message: "Success", systems}, {status: 201});
+    const user = await prisma.user.create({data: {name, username, email, image, hashedPassword, typeId, postId, departmentId}});
+    return NextResponse.json({message: "Success", user}, {status: 201});
+
   } catch (err) {
     return NextResponse.json({message: "Error"}, {status: 500});
+
   } finally {
     await prisma.$disconnect();
   }
 };
+

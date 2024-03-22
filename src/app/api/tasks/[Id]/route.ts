@@ -3,59 +3,54 @@ import { NextResponse } from 'next/server';
 import { main } from '../route';
 
 // idで指定されたクライアントを取得
-export const GET = async (req: Request, res: NextResponse) => {
+export const PUT = async (req: Request, res: NextResponse) => {
   try {
-    const id: string = req.url.split("/systems/")[1];
+    const id: string = req.url.split("/tasks/")[1];
     await main();
-    const systems = await prisma.systems.findFirst({
-      include: {
-        director: true,
-        client: true,
-      },
-      where: { id } });
 
-    return NextResponse.json({ message: "Success", systems }, { status: 200 });
+    let {
+      name,
+      typeId,
+      statusId,
+      creatorId,
+      directorId,
+      managers,
+      startDate,
+      endDate,
+    } = await req.json()
+
+    // 既存の managers リレーションをクリア
+    await prisma.tasks.update({
+      where: { id },
+      data: {
+        managers: {
+          set: [], // 既存のすべての関連付けをクリア
+        },
+      },
+    });
+
+    // 新しい managers リレーションを追加
+    const tasks = await prisma.tasks.update({
+      where: { id },
+      data: {
+        name,
+        typeId,
+        statusId,
+        creatorId,
+        directorId,
+        // 新しい managers リレーションを設定
+        managers: {
+          connect: managers.map((managerId: string) => ({ id: managerId })),
+        },
+        startDate,
+        endDate,
+      },
+    });
+
+    return NextResponse.json({ message: "Success", tasks }, { status: 200 });
 
   } catch (err) {
     return NextResponse.json({ message: "Error" }, { status: 500 });
-
-  } finally {
-    await prisma.$disconnect();
-  }
-};
-
-// idで指定されたクライアントをアップデート
-export const PUT = async (req: Request, res: NextResponse) => {
-  try {
-    const id: string = req.url.split("/systems/")[1];
-    const {name, model, total_cnt, clientId, directorId} = await req.json();
-    await main();
-    const systems = await prisma.systems.update({
-      data: {name, model, total_cnt, clientId, directorId},
-      where: {id},
-    });
-    return NextResponse.json({message: "Success", systems}, {status: 200});
-
-  } catch (err) {
-    return NextResponse.json({message: "Error"}, {status: 500});
-
-  } finally {
-    await prisma.$disconnect();
-  }
-};
-
-// idで指定されたクライアントを削除
-export const DELETE = async (req: Request, res: NextResponse) => {
-  try {
-    const id: string = req.url.split("/systems/")[1];
-    await main();
-    const systems = await prisma.systems.delete({
-      where: {id},
-    });
-    return NextResponse.json({message: "Success", systems}, {status: 200});
-
-  } catch (err) {
-    return NextResponse.json({message: "Error"}, {status: 500});
 
   } finally {
     await prisma.$disconnect();
