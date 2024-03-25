@@ -5,32 +5,12 @@ import { Container } from '@/components/Container'
 import { useEffect, useRef, useState, Fragment } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
-import {
-  Clients,
-  Departments,
-  Devices,
-  Projects,
-  Status,
-  Systems,
-  User,
-} from '@prisma/client'
 import ProjectList from './ProjectList'
 import { MagnifyingGlassIcon, PlusIcon } from '@radix-ui/react-icons'
-
-// System モデルに関連付けられた Client モデルのデータを含む
-type ProjectWith = Projects & {
-  device: Devices & {
-    system: Systems & {
-      client: Clients
-    }
-  }
-} & {
-  director: User & {
-    department: Departments
-  }
-} & {
-  status: Status
-}
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
+import { ProjectWith } from '@/types'
+import Link from 'next/link'
 
 const SearchComponent: React.FC = () => {
   // 入力をフックスで監視
@@ -40,7 +20,6 @@ const SearchComponent: React.FC = () => {
   const systemRef = useRef<HTMLInputElement | null>(null)
   const deviceRef = useRef<HTMLInputElement | null>(null)
   const projectRef = useRef<HTMLInputElement | null>(null)
-
 
   // side barの監視(虫眼鏡の画像をクリックすると検索バーが表示される)
   const [open, setOpen] = useState(false)
@@ -84,11 +63,6 @@ const SearchComponent: React.FC = () => {
                 All Projects
               </h1>
               <p className="pb-2 text-xs text-gray-500">プロジェクト一覧</p>
-              <p className="pb-2 text-sm leading-4 text-gray-900 dark:text-slate-200">
-                {/* Client: {project?.device.system.client.name}　&gt;　System:{' '}
-                {project?.device.system.name}　&gt;　Device:{' '}
-                {project?.device.name}　&gt;　Project: {project?.name} */}
-              </p>
             </div>
           </div>
         </Container>
@@ -102,10 +76,9 @@ const SearchComponent: React.FC = () => {
         </div>
         {/* 新規追加アイコン */}
         <div className="fixed right-10 top-36 cursor-pointer">
-          <PlusIcon
-            onClick={() => setOpen(true)}
-            className="inline-block h-12 w-12 rounded-full bg-slate-100 p-2 shadow-md hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-950"
-          />
+          <Link href="project/create">
+            <PlusIcon className="inline-block h-12 w-12 rounded-full bg-slate-100 p-2 shadow-md hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-950" />
+          </Link>
         </div>
 
         {/* サイドバー */}
@@ -128,9 +101,21 @@ const SearchComponent: React.FC = () => {
                       <div className="flex h-full flex-col overflow-y-scroll bg-white py-6 shadow-xl dark:bg-slate-700">
                         <div className="px-4 pt-16 sm:px-6">
                           <div className="flex items-start justify-between">
+                            {/* サイドバータイトル */}
                             <Dialog.Title className="text-base font-semibold leading-6 text-gray-900 dark:text-slate-200">
-                              検索
+                              <div className="sm:flex sm:items-center">
+                                <div className="sm:flex-auto">
+                                  <h1 className="text-xl font-semibold text-gray-900 dark:text-slate-200">
+                                    Search Project
+                                  </h1>
+                                  <p className="pb-2 text-xs text-gray-500">
+                                    プロジェクトの検索
+                                  </p>
+                                </div>
+                              </div>
                             </Dialog.Title>
+
+                            {/* 閉じるボタン */}
                             <div className="ml-3 flex h-7 items-center">
                               <button
                                 type="button"
@@ -150,86 +135,65 @@ const SearchComponent: React.FC = () => {
                         <div className="relative mt-6 flex-1 px-4 sm:px-6">
                           <div className="space-y-4">
                             {/* 検索フォーム */}
-                            <div className="grid grid-cols-4 gap-4">
-                              <div className="col-span-1">
-                                <h2 className="text-base text-gray-900 dark:text-slate-200">
-                                  企業名
-                                </h2>
-                              </div>
 
-                              <div className="col-span-3">
-                                <input
-                                  type="text"
-                                  onChange={(e) => handleSearch(e.target.value)}
-                                  ref={clientRef}
-                                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-slate-800 dark:text-slate-200 sm:text-sm sm:leading-6"
-                                  placeholder="検索..."
-                                />
-                              </div>
+                            {/* 企業名 */}
+                            <div className="grid w-full max-w-sm items-center gap-1.5">
+                              <Label htmlFor="name">企業名</Label>
+                              <Input
+                                type="text"
+                                id="client"
+                                placeholder="検索..."
+                                onChange={(e) => handleSearch(e.target.value)}
+                                ref={clientRef}
+                              />
+                            </div>
 
-                              <div className="col-span-1">
-                                <h2 className="text-base text-gray-900 dark:text-slate-200">
-                                  責任者
-                                </h2>
-                              </div>
+                            {/* 責任者 */}
+                            <div className="grid w-full max-w-sm items-center gap-1.5">
+                              <Label htmlFor="name">責任者</Label>
+                              <Input
+                                type="text"
+                                id="director"
+                                placeholder="検索..."
+                                onChange={(e) => handleSearch(e.target.value)}
+                                ref={directorRef}
+                              />
+                            </div>
 
-                              <div className="col-span-3">
-                                <input
-                                  type="text"
-                                  onChange={(e) => handleSearch(e.target.value)}
-                                  ref={directorRef}
-                                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-slate-800 dark:text-slate-200 sm:text-sm sm:leading-6"
-                                  placeholder="検索..."
-                                />
-                              </div>
+                            {/* 設備名 */}
+                            <div className="grid w-full max-w-sm items-center gap-1.5">
+                              <Label htmlFor="name">設備名</Label>
+                              <Input
+                                type="text"
+                                id="system"
+                                placeholder="検索..."
+                                onChange={(e) => handleSearch(e.target.value)}
+                                ref={systemRef}
+                              />
+                            </div>
 
-                              <div className="col-span-1">
-                                <h2 className="text-base text-gray-900 dark:text-slate-200">
-                                  設備名
-                                </h2>
-                              </div>
+                            {/* 装置名 */}
+                            <div className="grid w-full max-w-sm items-center gap-1.5">
+                              <Label htmlFor="name">装置名</Label>
+                              <Input
+                                type="text"
+                                id="device"
+                                placeholder="検索..."
+                                onChange={(e) => handleSearch(e.target.value)}
+                                ref={deviceRef}
+                              />
+                            </div>
 
-                              <div className="col-span-3">
-                                <input
-                                  type="text"
-                                  onChange={(e) => handleSearch(e.target.value)}
-                                  ref={systemRef}
-                                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-slate-800 dark:text-slate-200 sm:text-sm sm:leading-6"
-                                  placeholder="検索..."
-                                />
-                              </div>
-
-                              <div className="col-span-1">
-                                <h2 className="text-base text-gray-900 dark:text-slate-200">
-                                  装置名
-                                </h2>
-                              </div>
-
-                              <div className="col-span-3">
-                                <input
-                                  type="text"
-                                  onChange={(e) => handleSearch(e.target.value)}
-                                  ref={deviceRef}
-                                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-slate-800 dark:text-slate-200 sm:text-sm sm:leading-6"
-                                  placeholder="検索..."
-                                />
-                              </div>
-
-                              <div className="col-span-1">
-                                <h2 className="text-base text-gray-900 dark:text-slate-200">
-                                  プロジェクト名
-                                </h2>
-                              </div>
-
-                              <div className="col-span-3">
-                                <input
-                                  type="text"
-                                  onChange={(e) => handleSearch(e.target.value)}
-                                  ref={projectRef}
-                                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-slate-800 dark:text-slate-200 sm:text-sm sm:leading-6"
-                                  placeholder="検索..."
-                                />
-                              </div>
+                            {/* プロジェクト名 */}
+                            <div className="grid w-full max-w-sm items-center gap-1.5">
+                              <Label htmlFor="name">プロジェクト名</Label>
+                              <Input
+                                type="text"
+                                id="device"
+                                placeholder="検索..."
+                                onChange={(e) => handleSearch(e.target.value)}
+                                ref={projectRef}
+                              />
                             </div>
                           </div>
                         </div>

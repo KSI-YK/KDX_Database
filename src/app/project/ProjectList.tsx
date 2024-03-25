@@ -94,13 +94,7 @@ const SearchResultsList: React.FC<SearchResultsListProps> = ({
                 <div className="px-4 py-2 sm:px-6">
                   <div className="flex min-w-0 flex-auto items-center justify-between py-2">
                     <div>
-                      {/* <p className="text-sm leading-6 text-gray-900 dark:text-slate-200">
-                          {project.device.system.client.name}/
-                          {project.device.system.name}/{project.device.name}
-                        </p>
-                        <p className="text-sm font-semibold leading-6 text-gray-900 dark:text-slate-200">
-                          {project.name}
-                        </p> */}
+
                       {/* ページヘッダー */}
                       <div className="sm:flex sm:items-center">
                         <div className="sm:flex-auto">

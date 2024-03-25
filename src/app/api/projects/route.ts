@@ -42,11 +42,31 @@ export const GET = async (req: Request, res: NextResponse) => {
 
 export const POST = async (req: Request, res: NextResponse) => {
   try {
-    const { name, model, total_cnt, clientId, directorId } = await req.json()
+    const {
+      name,
+      typeId,
+      statusId,
+      deviceId,
+      directorId,
+      managers,
+      startDate,
+      endDate,
+    } = await req.json()
 
     await main()
-    const clients = await prisma.systems.create({
-      data: { name, model, total_cnt, clientId, directorId },
+    const clients = await prisma.projects.create({
+      data: {
+        name,
+        typeId,
+        statusId,
+        deviceId,
+        directorId,
+        projectManagers: {
+          connect: managers.map((managerId: string) => ({ id: managerId })),
+        },
+        startDate,
+        endDate
+      },
     })
     return NextResponse.json({ message: 'Success', clients }, { status: 201 })
   } catch (err) {

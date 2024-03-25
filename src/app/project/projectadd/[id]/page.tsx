@@ -3,7 +3,6 @@ import { Footer } from '@/components/layouts/Footer';
 import * as System from '@/components/system/index';
 import prisma from '@/lib/prisma';
 
-
 export default async function ClientPage() {
   const clients = await prisma.clients.findMany();
   const user = await prisma.user.findMany();

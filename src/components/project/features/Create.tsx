@@ -1,217 +1,330 @@
 'use client'
-
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Container } from '@/components/Container'
+import {
+  Clients,
+  Devices,
+  ProjectTypes,
+  Status,
+  Systems,
+  User,
+} from '@prisma/client'
+import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
-import { Button } from '@/components/Button'
-import { Clients, Systems, User } from '@prisma/client'
-import Select from 'react-select'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import Select, { ActionMeta, MultiValue } from 'react-select'
+import { DateRange } from 'react-day-picker'
+import { DatePickerWithRange } from '@/components/DatePickerWithRange'
+import { utcToZonedTime, format } from 'date-fns-tz'
+import { addProject } from '@/app/project/ApiReqProject'
+
+interface Option {
+  value: string | undefined
+  label: string | undefined
+}
 
 interface CreatePageProps {
   clients: Clients[]
+  initSystems: Systems[]
+  initDevices: Devices[]
   user: User[]
+  projectTypes: ProjectTypes[]
+  status: Status[]
 }
 
-type system = Systems
-
-interface Option {
-  value: string
-  label: string
-}
-
-// プロジェクト追加処理
-const addSystem = async (
-  name: string | undefined,
-  model: string | undefined,
-  systemId: string | undefined,
-  directorId: string | undefined,
-) => {
-  // api
-  const res = await fetch(`http://localhost:3000/api/devices`, {
-    method: 'POST',
-    body: JSON.stringify({ name, model, systemId, directorId }),
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
-  return res.json()
-}
-
-// 指定取得処理
-const getSystemsForClient = async (id: string | undefined) => {
-  // api
-  const res = await fetch(
-    `http://localhost:3000/api/systems/searchClientId/${id}`,
-  )
-  const data = await res.json()
-  return data.systems
-}
-
-const CreatePage: React.FC<CreatePageProps> = ({ clients, user }) => {
+// Main
+const Create: React.FC<CreatePageProps> = ({
+  clients,
+  initSystems,
+  initDevices,
+  user, // ユーザー一覧
+  projectTypes, // タスク種別一覧
+  status, // 状態一覧
+}) => {
   const router = useRouter()
-  const [selectedClient, setSelectedClient] = useState<Option | null>(null)
-  const [selectedSystem, setSelectedSystem] = useState<Option | null>(null)
-  const [systemOptions, setSystemOptions] = useState<Option[]>([])
+  // -------フックスでの入力監視
+  // タスク名
+  const [inputName, setName] = useState('')
+  // 種別
+  const [selectedType, setType] = useState<Option | null>(null)
+  // 状態
+  const [selectedStatus, setStatus] = useState<Option | null>(null)
+  // 依頼者
+  const [selectedClient, setClient] = useState<Option | null>(null)
+  // システム
+  const [selectedSystem, setSystem] = useState<Option | null>(null)
+  // デバイス
+  const [selectedDevice, setDevice] = useState<Option | null>(null)
+  // 責任者
+  const [selectedDirector, setDirector] = useState<Option | null>(null)
+  // 担当者（配列）
+  const [selectedManagers, setManagers] = useState<Option[] | null>([])
+  // タスクの開始日と終了日
+  const [dateRange, setDateRange] = useState<DateRange | undefined>()
 
-  const [selectedDirector, setSelectedDirector] = useState<Option | null>(null)
-  const [systemName, setSystemName] = useState('')
-  const [systemModel, setSystemModel] = useState('')
+  // SystemとDeviceをフィルタリングする
+  const [filteredSystems, setFilteredSystems] = useState<Option[]>([])
+  const [filteredDevices, setFilteredDevices] = useState<Option[]>([])
 
-  const handleClientChange = async (selectedOption: Option | null) => {
-    setSelectedClient(selectedOption)
-    if (selectedOption) {
-      // 選択されたクライアントに基づいて利用可能なシステムを取得するAPIを呼び出すなど
-      // ここでは仮のロジックを示します。実際には、API呼び出しや、
-      // 既にフロントエンドにあるデータからフィルタリングするなどの方法が考えられます。
-      const systemsForSelectedClient = await getSystemsForClient(
-        selectedOption.value,
-      )
-      const newSystemOptions = systemsForSelectedClient.map(
-        (system: Systems) => ({
-          value: system.id,
-          label: system.name,
-        }),
-      )
-      setSystemOptions(newSystemOptions)
-    } else {
-      setSystemOptions([])
-    }
+  // DatePickerWithRangeから日付範囲の変更を受け取る
+  const handleDateChange = (newRange: DateRange | undefined) => {
+    setDateRange(newRange)
   }
 
+  // Clientが変更されたら、Systemsの初期値をフィルタリング後にOption形式に変換する
+  useEffect(() => {
+    // クライアントに対して、Systemが登録されていない場合のエラー処理を後から追加したい
+    if (initSystems && selectedClient) {
+      const filtered = initSystems.filter(
+        (system) => system.clientId === selectedClient.value,
+      )
+      const systemOptions = filtered.map((system) => ({
+        value: system.id,
+        label: system.name,
+      }))
+      setFilteredSystems(systemOptions)
+    }
+  }, [selectedClient]) // Clientが選択された時に実行
+
+  // Systemが変更されたら、Devicesの初期値をフィルタリング後にOption形式に変換する
+  useEffect(() => {
+    // クライアントに対して、Systemが登録されていない場合のエラー処理を後から追加したい
+    if (initDevices && selectedSystem) {
+      const filtered = initDevices.filter(
+        (device) => device.systemId === selectedSystem.value,
+      )
+      const deviceOptions = filtered.map((device) => ({
+        value: device.id,
+        label: device.name,
+      }))
+      setFilteredDevices(deviceOptions)
+    }
+  }, [selectedSystem]) // Clientが選択された時に実行
+
+  // 開始日と終了日をDATETIME形式に変換する関数
+  const formatDateTime = (date?: Date) => {
+    if (!date) return ''
+    // JSTのタイムゾーンID
+    const timeZone = 'Asia/Tokyo'
+
+    // UTC時刻をJST時刻に変換
+    const jstDate = utcToZonedTime(date, timeZone)
+
+    // JST時刻を指定のフォーマットで文字列化
+    return format(jstDate, "yyyy-MM-dd'T'HH:mm:ssXXX", { timeZone })
+  }
+
+  // 登録処理
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (selectedSystem && selectedDirector) {
-      await addSystem(
-        systemName,
-        systemModel,
-        selectedSystem.value,
+    const startDate = formatDateTime(dateRange?.from)
+    const endDate = formatDateTime(dateRange?.to)
+    console.log(startDate)
+    if (
+      inputName &&
+      selectedType &&
+      selectedStatus &&
+      selectedDevice &&
+      selectedDirector &&
+      selectedManagers
+    ) {
+      const managerValues = selectedManagers
+        ? selectedManagers.map((manager) => manager.value)
+        : []
+      await addProject(
+        inputName,
+        selectedType.value,
+        selectedStatus.value,
+        selectedDevice.value,
         selectedDirector.value,
+        managerValues,
+        startDate,
+        endDate,
       )
-      router.push('/database/device')
+      router.push('/project')
       router.refresh
+    } else {
+      alert('入力不足')
     }
   }
 
-  // clientsを適切な形式に変換
+  // onChangeハンドラ
+  const handleSelectChange = (
+    newValue: MultiValue<{ value: string; label: string }>,
+    actionMeta: ActionMeta<{ value: string; label: string }>,
+  ) => {
+    // MultiValueをOption[]型に変換
+    const newManagers: Option[] = newValue.map((option) => ({
+      value: option.value,
+      label: option.label,
+    }))
+
+    // ステート更新
+    setManagers(newManagers)
+  }
+
+  // Optionsを適切な形式に変換
+  const userOptions = user.map((user) => ({ value: user.id, label: user.name }))
   const clientOptions = clients.map((client) => ({
     value: client.id,
     label: client.name,
   }))
-  const userOptions = user.map((user) => ({ value: user.id, label: user.name }))
+  const statusOptions = status.map((status) => ({
+    value: status.id,
+    label: status.name,
+  }))
+  const projectOptions = projectTypes.map((projectOp) => ({
+    value: projectOp.id,
+    label: projectOp.name,
+  }))
 
-  // html生成
+  // 開始日と終了日をDATETIME形式に変換
+  const startDate = dateRange?.from
+    ? format(dateRange.from, "yyyy-MM-dd'T'HH:mm:ss")
+    : ''
+  const endDate = dateRange?.to
+    ? format(dateRange.to, "yyyy-MM-dd'T'HH:mm:ss")
+    : ''
+
   return (
-    <Container className="pb-2 pt-20 lg:pt-6">
+    <Container className="pb-2">
       <div className="space-y-4">
+        {/* ページヘッダー */}
         <div className="sm:flex sm:items-center">
-          <div className="sm:flex-auto">
-            <div className="border-b border-gray-900/10 pb-4 pt-4">
-              <h1 className="text-base font-semibold leading-6 text-gray-900 dark:text-slate-200">
-                新規登録/System
-              </h1>
-            </div>
+          <div className="border-b border-gray-300 dark:border-gray-500 sm:flex-auto">
+            <h1 className="pt-4 text-3xl font-semibold text-gray-900 dark:text-slate-200">
+              Create Project
+            </h1>
+            <p className="pb-2 text-xs text-gray-500">プロジェクトの作成</p>
           </div>
         </div>
 
-        {/* 検索フォーム */}
+        {/* タスク情報入力フォーム */}
         <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-4 gap-4">
-            {/* 企業名選択 */}
-
-            <div className="col-span-1">
-              <h1 className="text-base leading-4 text-gray-900 dark:text-slate-200">
-                企業名/Client
-              </h1>
-            </div>
-
-            <div className="col-span-3">
+          <div className="flex flex-col gap-4">
+            {/* 種別入力 */}
+            <div className="grid w-full max-w-sm items-center gap-1.5">
+              <Label htmlFor="status">客先</Label>
               <Select
-                className="basic-single rounded-md text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                classNamePrefix="select"
-                isSearchable={true}
+                id="client"
                 name="client"
+                className="my-react-select-container"
+                classNamePrefix="my-react-select"
                 options={clientOptions}
-                onChange={handleClientChange} // ここを更新
+                onChange={setClient}
               />
             </div>
 
-            {/* 設備名選択 */}
-
-            <div className="col-span-1">
-              <h1 className="text-base leading-4 text-gray-900 dark:text-slate-200">
-                装置名/System
-              </h1>
-            </div>
-
-            <div className="col-span-3">
+            {/* 設備入力 */}
+            <div className="grid w-full max-w-sm items-center gap-1.5">
+              <Label htmlFor="status">設備</Label>
               <Select
-                className="basic-single rounded-md text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                classNamePrefix="select"
-                isSearchable={true}
-                name="client"
-                options={systemOptions}
-                onChange={setSelectedSystem}
+                id="system"
+                name="system"
+                className="my-react-select-container"
+                classNamePrefix="my-react-select"
+                options={filteredSystems}
+                onChange={setSystem}
               />
             </div>
 
-            {/* 設備名入力 */}
-
-            <div className="col-span-1">
-              <h1 className="text-base leading-4 text-gray-900 dark:text-slate-200">
-                設備名/Name
-              </h1>
-            </div>
-
-            <div className="col-span-3">
-              <input
-                type="text"
-                onChange={(e) => setSystemName(e.target.value)}
-                name="name"
-                id="name"
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-slate-800 dark:text-slate-200 sm:text-sm sm:leading-6"
-                placeholder="KDM4型造型期"
+            {/* 装置入力 */}
+            <div className="grid w-full max-w-sm items-center gap-1.5">
+              <Label htmlFor="status">装置</Label>
+              <Select
+                id="device"
+                name="device"
+                className="my-react-select-container"
+                classNamePrefix="my-react-select"
+                options={filteredDevices}
+                onChange={setDevice}
               />
             </div>
 
-            {/* 型式入力 */}
-
-            <div className="col-span-1">
-              <h1 className="text-base leading-4 text-gray-900 dark:text-slate-200">
-                型式/Model
-              </h1>
+            {/* タスク名 */}
+            <div className="grid w-full max-w-sm items-center gap-1.5">
+              <Label htmlFor="name">プロジェクト名</Label>
+              <Input
+                type="text"
+                id="name"
+                placeholder="プログラム変更"
+                onChange={(e) => setName(e.target.value)}
+              />
             </div>
 
-            <div className="col-span-3">
-              <input
-                type="text"
-                onChange={(e) => setSystemModel(e.target.value)}
-                name="name"
-                id="name"
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-slate-800 dark:text-slate-200 sm:text-sm sm:leading-6"
-                placeholder="KDM-4"
+            {/* 種別入力 */}
+            <div className="grid w-full max-w-sm items-center gap-1.5">
+              <Label htmlFor="status">種別</Label>
+              <Select
+                id="status"
+                name="status"
+                className="my-react-select-container"
+                classNamePrefix="my-react-select"
+                options={projectOptions}
+                onChange={setType}
+              />
+            </div>
+
+            {/* 状態入力 */}
+            <div className="grid w-full max-w-sm items-center gap-1.5">
+              <Label htmlFor="status">状態</Label>
+              <Select
+                id="status"
+                name="status"
+                className="my-react-select-container"
+                classNamePrefix="my-react-select"
+                options={statusOptions}
+                onChange={setStatus}
               />
             </div>
 
             {/* 責任者選択 */}
-
-            <div className="col-span-1">
-              <h1 className="text-base leading-4 text-gray-900 dark:text-slate-200">
-                責任者/Director
-              </h1>
+            <div className="grid w-full max-w-sm items-center gap-1.5">
+              <Label htmlFor="director">責任者</Label>
+              <Select
+                id="director"
+                name="director"
+                className="my-react-select-container"
+                classNamePrefix="my-react-select"
+                isSearchable={true}
+                options={userOptions}
+                onChange={setDirector}
+              />
             </div>
 
-            <div className="col-span-3">
+            {/* 担当者選択（複数選択可） */}
+            <div className="grid w-full max-w-sm items-center gap-1.5">
+              <Label htmlFor="manager">担当者 ※複数選択可</Label>
               <Select
-                className="basic-single rounded-md text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                classNamePrefix="select"
+                id="manager"
+                name="manager"
+                isMulti
+                className="my-react-select-container"
+                classNamePrefix="my-react-select"
                 isSearchable={true}
-                name="director"
                 options={userOptions}
-                onChange={setSelectedDirector}
+                onChange={handleSelectChange}
               />
+            </div>
+
+            {/* 開始→終了の期間選択 */}
+            <div className="grid w-full max-w-sm items-center gap-1.5">
+              <Label>プロジェクト期間</Label>
+              <DatePickerWithRange
+                className=""
+                onDateChange={handleDateChange}
+              />
+              <div>
+                <p className="text-xs text-gray-500">開始日: {startDate}</p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500">終了日: {endDate}</p>
+              </div>
             </div>
           </div>
 
+          {/* 登録ボタン */}
           <div className="my-4 flex flex-row-reverse">
             <div>
               <Button type="submit">登録</Button>
@@ -223,4 +336,4 @@ const CreatePage: React.FC<CreatePageProps> = ({ clients, user }) => {
   )
 }
 
-export default CreatePage
+export default Create

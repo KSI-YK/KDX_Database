@@ -2,6 +2,7 @@ import {
   Clients,
   Departments,
   Devices,
+  ProjectTypes,
   Projects,
   Status,
   Systems,
@@ -46,7 +47,8 @@ export type TaskWith = Tasks & {
 }
 
 export type ProjectWith = Projects & {
-  status: Status
+  status: Status,
+  type: ProjectTypes
   device: Devices & {
     system: Systems & {
       client: Clients

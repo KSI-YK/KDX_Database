@@ -83,3 +83,33 @@ export const updateTaskStatus = async (
     console.error('Error updating status:', error)
   }
 }
+
+// Project追加
+export const addProject = async (
+  name: string | undefined,
+  typeId: string | undefined,
+  statusId: string | undefined,
+  deviceId: string | undefined,
+  directorId: string | undefined,
+  managers: (string | undefined)[],
+  startDate: any,
+  endDate: any,
+) => {
+  const res = await fetch(`http://localhost:3000/api/projects`, {
+    method: 'POST',
+    body: JSON.stringify({
+      name,
+      typeId,
+      statusId,
+      deviceId,
+      directorId,
+      managers,
+      startDate,
+      endDate,
+    }),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+  return res.json()
+}
