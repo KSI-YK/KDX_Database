@@ -58,3 +58,4 @@ export type ProjectWith = Projects & {
     department: Departments
   }
 }
+

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/Button";
 import { Clients, Systems, User } from '@prisma/client';
 import Select from 'react-select';
+import UploadForm from "@/components/InputImage";
 
 interface CreatePageProps {
     clients: Clients[];
@@ -210,6 +211,9 @@ const CreatePage: React.FC<CreatePageProps> = ({ clients, user }) => {
                     </div>
                 </form>
             </div>
+
+      <UploadForm />
+
         </Container>
     )
 }
