@@ -7,6 +7,7 @@ import { Departments, UserPosts, UserTypes } from '@prisma/client'
 import UploadForm from '../InputImage'
 import React, { useState } from 'react'
 
+
 interface Props {
   departments: Departments[]
   userTypes: UserTypes[]
