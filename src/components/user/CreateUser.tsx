@@ -65,4 +65,5 @@ const CreateUser: React.FC<Props> = ({ departments, userTypes, userPosts }) => {
     </Container>
   )
 }
+
 export default CreateUser
