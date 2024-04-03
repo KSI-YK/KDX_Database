@@ -1,12 +1,22 @@
 'use client'
 
 import { Container } from '@/components/Container'
-import { getServerSession } from 'next-auth'
-import { options } from '@/lib/options'
 import { Departments, UserPosts, UserTypes } from '@prisma/client'
-import UploadForm from '../InputImage'
+import InputImage from '../InputImage'
 import React, { useState } from 'react'
-
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { formSchema } from '@/lib/formSchema'
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '../ui/form'
+import { Input } from '../ui/input'
 
 interface Props {
   departments: Departments[]
@@ -16,6 +26,15 @@ interface Props {
 
 const CreateUser: React.FC<Props> = ({ departments, userTypes, userPosts }) => {
   const [filePath, setFilePath] = useState('')
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      username: '',
+      hashedPassword: '',
+      image: null,
+      email: '',
+    },
+  })
 
   const handleUploadSuccess = (path: string) => {
     const webPath = path.replace('./public', '')
@@ -30,24 +49,43 @@ const CreateUser: React.FC<Props> = ({ departments, userTypes, userPosts }) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ filePath: `public/images/user/${filePath.split('/').pop()}` }), // ファイル名をサーバーの相対パスに変換
-      });
+        body: JSON.stringify({
+          filePath: `public/images/user/${filePath.split('/').pop()}`,
+        }), // ファイル名をサーバーの相対パスに変換
+      })
       if (!response.ok) {
-        throw new Error('Failed to delete the file');
+        throw new Error('Failed to delete the file')
       }
       // ファイル削除成功
-      setFilePath(''); // UIから画像を削除
+      setFilePath('') // UIから画像を削除
     } catch (error) {
-      console.error('Error deleting the file:', error);
+      console.error('Error deleting the file:', error)
     }
-  };
+  }
 
   //html生成
   return (
     <Container className="pb-2 pt-20 lg:pt-6">
       {/* ファイルをアップロード */}
       <div>
-        <UploadForm onUploadSuccess={handleUploadSuccess} />
+        const form = useForm()
+        <FormField
+          control={form.control}
+          name="username"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Username</FormLabel>
+              <FormControl>
+                <Input placeholder="shadcn" {...field} />
+              </FormControl>
+              <FormDescription>
+                This is your public display name.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <InputImage onUploadSuccess={handleUploadSuccess} />
         {filePath && (
           <>
             <p>アップロードされたファイル: {filePath}</p>

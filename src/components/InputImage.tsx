@@ -4,7 +4,7 @@ type UploadFormProps = {
   onUploadSuccess: (filePath: string) => void
 }
 
-const UploadForm: React.FC<UploadFormProps> = ({ onUploadSuccess }) => {
+const InputImage: React.FC<UploadFormProps> = ({ onUploadSuccess }) => {
   const [file, setFile] = useState<File | null>(null)
   const [response, setResponse] = useState<{ status: number; body: any }>()
 
@@ -51,4 +51,4 @@ const UploadForm: React.FC<UploadFormProps> = ({ onUploadSuccess }) => {
   )
 }
 
-export default UploadForm
+export default InputImage
