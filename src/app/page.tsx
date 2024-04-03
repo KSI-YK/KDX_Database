@@ -1,29 +1,27 @@
-import Header from '@/components/layouts/Header';
-import { Footer } from '@/components/layouts/Footer';
-import { Hero } from '@/components/Hero';
-
+import Header from '@/components/layouts/Header'
+import { Footer } from '@/components/layouts/Footer'
+import { Hero } from '@/components/Hero'
 
 interface User {
-  id: number;
-  name: string;
-  email: string;
+  id: number
+  name: string
+  email: string
 }
 
 interface HomeProps {
-  users: User[];
+  users: User[]
 }
-
 
 const Home: React.FC<HomeProps> = ({ users }) => {
   return (
     <>
       <Header />
-      <main className='pt-14'>
+      <main className="pt-14">
         <Hero />
       </main>
       <Footer />
     </>
-  );
-};
+  )
+}
 
-export default Home;
+export default Home

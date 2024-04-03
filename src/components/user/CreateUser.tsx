@@ -4,7 +4,7 @@ import { Container } from '@/components/Container'
 import { Departments, UserPosts, UserTypes } from '@prisma/client'
 import InputImage from '../InputImage'
 import React, { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { FormProvider, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { formSchema } from '@/lib/formSchema'
 import {
@@ -26,7 +26,7 @@ interface Props {
 
 const CreateUser: React.FC<Props> = ({ departments, userTypes, userPosts }) => {
   const [filePath, setFilePath] = useState('')
-  const form = useForm({
+  const formMethods = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       username: '',
@@ -68,38 +68,39 @@ const CreateUser: React.FC<Props> = ({ departments, userTypes, userPosts }) => {
     <Container className="pb-2 pt-20 lg:pt-6">
       {/* ファイルをアップロード */}
       <div>
-        const form = useForm()
-        <FormField
-          control={form.control}
-          name="username"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Username</FormLabel>
-              <FormControl>
-                <Input placeholder="shadcn" {...field} />
-              </FormControl>
-              <FormDescription>
-                This is your public display name.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <InputImage onUploadSuccess={handleUploadSuccess} />
-        {filePath && (
-          <>
-            <p>アップロードされたファイル: {filePath}</p>
-            {/* 画像を表示 */}
-            <img
-              src={filePath}
-              alt="Uploaded"
-              style={{ maxWidth: '100%', height: 'auto' }}
+        {/* FormProviderを使ってフォームのコンテキストを提供 */}
+        <FormProvider {...formMethods}>
+          {/* フォームの内容 */}
+          <form
+            onSubmit={formMethods.handleSubmit((data) => console.log(data))}
+          >
+            <Input
+              placeholder="Username"
+              {...formMethods.register('username')}
             />
-
-            {/* キャンセルボタン */}
-            <button onClick={handleCancel}>キャンセル</button>
-          </>
-        )}
+            <Input
+              placeholder="Password"
+              {...formMethods.register('hashedPassword')}
+            />
+            <Input
+              placeholder="従業員名"
+              {...formMethods.register('username')}
+            />
+            <Input
+              placeholder="email"
+              {...formMethods.register('email')}
+            />
+            <InputImage onUploadSuccess={handleUploadSuccess} />
+            {filePath && (
+              <>
+                <p>アップロードされたファイル: {filePath}</p>
+                <img src={filePath} alt="Uploaded" />
+                <button onClick={handleCancel}>キャンセル</button>
+              </>
+            )}
+            {/* その他のフォーム要素 */}
+          </form>
+        </FormProvider>
       </div>
     </Container>
   )

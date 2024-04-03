@@ -2,14 +2,8 @@ import Header from '@/components/layouts/Header';
 import { Footer } from '@/components/layouts/Footer';
 import UserList from '@/components/user/UserList';
 import CreateUser from '@/components/user/CreateUser';
-import bcrypt from 'bcrypt'
-import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid'
-import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
-import { revalidatePath } from 'next/cache'
-import { Container } from '@/components/Container'
-import { getServerSession } from 'next-auth'
-import { options } from '@/lib/options'
+
 
 
 interface User {
@@ -37,7 +31,6 @@ const Home: React.FC<HomeProps> = async ({ users }) => {
         departments = {departments}
         userTypes = {userTypes}
         userPosts = {userPosts}
-
         />
         <UserList />
       </main>

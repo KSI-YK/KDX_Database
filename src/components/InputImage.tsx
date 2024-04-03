@@ -44,9 +44,10 @@ const InputImage: React.FC<UploadFormProps> = ({ onUploadSuccess }) => {
   }
 
   return (
-    <form onSubmit={uploadFile}>
+    <form>
       <input type="file" name="file" onChange={handleFileChange} />
-      <button type="submit">アップロード</button>
+      <button type="button" onClick={uploadFile}>アップロード</button>
+
     </form>
   )
 }
