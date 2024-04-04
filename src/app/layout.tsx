@@ -26,6 +26,7 @@ const lexend = Lexend({
   variable: '--font-lexend',
 })
 
+
 export default function RootLayout({
   children,
 }: {
